@@ -9,3 +9,19 @@ body {
     height: 100vh;
     width: 100%;
 }
+
+#titleBar {
+    text-align: center;
+}
+
+#titleBar img {
+    width: 50px;
+    height: auto;
+    float: left;
+    margin: 10px;
+}
+
+#titleBar h3 {
+    float: right;
+    margin-right: 10px;
+}
