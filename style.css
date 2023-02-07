@@ -5,23 +5,14 @@ body {
     width: 100%;
 }
 
-#sidePanel {
-    width: 20%;
-    float: left;
-}
-
-#viewDiv {
-    height: 95vh;
-    width: 80%;
-    float: right;
-}
-
 #titleBar {
     text-align: center;
     height: 5vh;
     width: 100%;
     background-color: #004b8d;
     color: #fff;
+    display: flex;
+    align-items: center;
 }
 
 #titleBar img {
@@ -33,6 +24,37 @@ body {
 }
 
 #titleBar h3 {
+    font-size: 20px;
+}
+
+#sidePanel {
+    width: 20%;
+    float: left;
+    text-align: center;
+}
+
+#sidePanel h5{
+    font-size: 16px;
+}
+
+#sidePanel p{
+    font-size: 12px;
+    margin-left: 10px;
+    text-align: left;
+}
+
+#sidePanel button{
+    background-color: #004b8d;
+    color: #fff;
+    margin: 10px;
+}
+
+#sidePanel button:hover{
+    background-color: #b6b8ba;
+}
+
+#viewDiv {
+    height: 95vh;
+    width: 80%;
     float: right;
-    margin-right: 10px;
 }
