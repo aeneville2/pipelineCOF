@@ -5,13 +5,23 @@ body {
     width: 100%;
 }
 
+#sidePanel {
+    width: 20%;
+    float: left;
+}
+
 #viewDiv {
-    height: 100vh;
-    width: 100%;
+    height: 95vh;
+    width: 80%;
+    float: right;
 }
 
 #titleBar {
     text-align: center;
+    height: 5vh;
+    width: 100%;
+    background-color: #004b8d;
+    color: #fff;
 }
 
 #titleBar img {
@@ -19,6 +29,7 @@ body {
     height: auto;
     float: left;
     margin: 10px;
+    background-color: #fff;
 }
 
 #titleBar h3 {

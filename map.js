@@ -77,7 +77,7 @@ require([
         container: "toolBar"
     });
 
-    view.ui.add("titleBar","top-left");
+    //view.ui.add("titleBar","top-left");
     view.ui.move("zoom","top-left");
     view.ui.add("toolBar","top-right");
 
