@@ -16,8 +16,8 @@ require([
     const view = new MapView({
         container: "viewDiv",
         map: map,
-        center: [-111.65, 40.4],
-        zoom: 12
+        center: [-111.75, 40.37],
+        zoom: 13
     });
 
     const basemapGallery = new BasemapGallery({
@@ -94,7 +94,73 @@ require([
         popupTemplate: {
             title: "M&I Pipes"
         },
-        definitionExpression: "facility_name = 'Alpine Aqueduct Reach 3'"
+        definitionExpression: "facility_name = 'Alpine Aqueduct Reach 3'",
+        title: "Alpine Aqueduct Reach 3 Pipelines"
     });
-    map.add(miPipes);
+
+    const roads = new FeatureLayer({
+        url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/UtahRoads/FeatureServer/0",
+        visible: false,
+        title: "Utah Roads"
+    });
+    
+    const railroads = new FeatureLayer({
+        url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/UtahRailroads/FeatureServer/0",
+        visible: false,
+        title: "Utah Railroads",
+        renderer: {
+            type: "simple",
+            symbol: {
+                type: "simple-line",
+                style: "short-dash-dot",
+                color: "#424242",
+                width: 2
+            }
+        }
+    });
+
+    const streams = new FeatureLayer({
+        url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/UtahStreamsNHD/FeatureServer/0",
+        visible: false,
+        title: "Utah Streams"
+    });
+
+    const lakes = new FeatureLayer({
+        url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/UtahLakesNHD/FeatureServer/0",
+        visible: false,
+        title: "Utah Lakes"
+    });
+
+    const utahCountyParcels = new FeatureLayer({
+        url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/Parcels_Utah_LIR/FeatureServer/0",
+        visible: false,
+        title: "Utah County Parcels",
+        renderer: {
+            type: "simple",
+            symbol: {
+                type: "simple-fill",
+                color: [0,0,0,0],
+                outline: {
+                    width: 0.75,
+                    color: "black"
+                }
+            }
+        }
+    });
+
+    const schoolsPreKto12 = new FeatureLayer({
+        url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/Schools_PreKto12/FeatureServer/0",
+        visible: false,
+        title: "PreK to 12 Schools"
+    });
+
+    const healthCareFacilities = new FeatureLayer({
+        url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/UtahHealthCareFacilities/FeatureServer/0",
+        visible: false,
+        title: "Health Care Facilities"
+    });
+
+    map.addMany([roads,railroads,streams,lakes,utahCountyParcels,schoolsPreKto12,healthCareFacilities]);
+    
+    map.add(miPipes,100);
 });
