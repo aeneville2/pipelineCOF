@@ -101,7 +101,89 @@ require([
     const roads = new FeatureLayer({
         url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/UtahRoads/FeatureServer/0",
         visible: false,
-        title: "Utah Roads"
+        title: "Utah Roads",
+        renderer: {
+            type: "unique-value",
+            field: "CARTOCODE",
+            defaultSymbol: {
+                type: "simple-line",
+                color: "#db7f39",
+                width: 1
+            },
+            uniqueValueInfos: [
+                {
+                    value: "1",
+                    symbol: {
+                        type: "simple-line",
+                        color: "#db7f39",
+                        width: 3
+                    }
+                },{
+                    value: "2",
+                    symbol: {
+                        type: "simple-line",
+                        color: "#db7f39",
+                        width: 3
+                    }
+                },{
+                    value: "3",
+                    symbol: {
+                        type: "simple-line",
+                        color: "#db7f39",
+                        width: 3
+                    }
+                },{
+                    value: "4",
+                    symbol: {
+                        type: "simple-line",
+                        color: "#db7f39",
+                        width: 3
+                    }
+                },{
+                    value: "5",
+                    symbol: {
+                        type: "simple-line",
+                        color: "#db7f39",
+                        width: 3
+                    }
+                },{
+                    value: "6",
+                    symbol: {
+                        type: "simple-line",
+                        color: "#db7f39",
+                        width: 2
+                    }
+                },{
+                    value: "7",
+                    symbol: {
+                        type: "simple-line",
+                        color: "#db7f39",
+                        width: 2
+                    }
+                },{
+                    value: "8",
+                    symbol: {
+                        type: "simple-line",
+                        color: "#db7f39",
+                        width: 2
+                    }
+                },{
+                    value: "9",
+                    symbol: {
+                        type: "simple-line",
+                        color: "#db7f39",
+                        width: 2
+                    }
+                },{
+                    value: "10",
+                    symbol: {
+                        type: "simple-line",
+                        color: "#db7f39",
+                        width: 2
+                    }
+                }
+            ]
+        }
     });
     
     const railroads = new FeatureLayer({
@@ -122,13 +204,92 @@ require([
     const streams = new FeatureLayer({
         url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/UtahStreamsNHD/FeatureServer/0",
         visible: false,
-        title: "Utah Streams"
+        title: "Utah Streams",
+        definitionExpression: "FCode_Text IN ('Canal/Ditch', 'Canal/Ditch - Aqueduct', 'Stream/River', 'Stream/River - Ephemeral',"
+        + "'Stream/River - Intermittent', 'Stream/River - Perennial')",
+        renderer: {
+            type: "unique-value",
+            field: "FCode_Text",
+            defaultSymbol: {
+                type: "simple-line",
+                color: "#22daf2"
+            },
+            uniqueValueInfos: [
+                {
+                    value: "Canal/Ditch",
+                    symbol: {
+                        type: "simple-line",
+                        color: "#99e6f0",
+                        marker: {
+                            color: "#99e6f0",
+                            placement: "begin",
+                            style: "cross"
+                        },
+                        width: 1
+                    }
+                },{
+                    value: "Canal/Ditch - Aqueduct",
+                    symbol: {
+                        type: "simple-line",
+                        color: "#99e6f0",
+                        marker: {
+                            color: "#99e6f0",
+                            placement: "begin-end",
+                            style: "cross"
+                        },
+                        width: 1
+                    }
+                },{
+                    value: "Stream/River",
+                    symbol: {
+                        type: "simple-line",
+                        color: "#99e6f0",
+                        style: "long-dash-dot-dot",
+                        width: 1
+                    }
+                },{
+                    value: "Stream/River - Intermittent",
+                    symbol: {
+                        type: "simple-line",
+                        color: "#99e6f0",
+                        style: "long-dash-dot-dot",
+                        width: 1
+                    }
+                },{
+                    value: "Stream/River - Ephemeral",
+                    symbol: {
+                        type: "simple-line",
+                        color: "#99e6f0",
+                        style: "long-dash-dot-dot",
+                        width: 1
+                    }
+                },{
+                    value: "Stream/River - Perennial",
+                    symbol: {
+                        type: "simple-line",
+                        color: "#99e6f0",
+                        width: 1
+                    }
+                }
+            ]
+        }
     });
 
     const lakes = new FeatureLayer({
         url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/UtahLakesNHD/FeatureServer/0",
         visible: false,
-        title: "Utah Lakes"
+        title: "Utah Lakes",
+        renderer: {
+            type: "simple",
+            symbol: {
+                type: "simple-fill",
+                color: "#99e6f0",
+                outline: {
+                    color: [0,0,0,0],
+                    width: 0
+                }
+            }
+        }
     });
 
     const utahCountyParcels = new FeatureLayer({
@@ -151,13 +312,29 @@ require([
     const schoolsPreKto12 = new FeatureLayer({
         url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/Schools_PreKto12/FeatureServer/0",
         visible: false,
-        title: "PreK to 12 Schools"
+        title: "PreK to 12 Schools",
+        renderer: {
+            type: "simple",
+            symbol: {
+                type: "web-style",
+                styleName: "Esri2DPointSymbolsStyle",
+                name: "school"
+            }
+        }
     });
 
     const healthCareFacilities = new FeatureLayer({
         url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/UtahHealthCareFacilities/FeatureServer/0",
         visible: false,
-        title: "Health Care Facilities"
+        title: "Health Care Facilities",
+        renderer: {
+            type: "simple",
+            symbol: {
+                type: "web-style",
+                styleName: "Esri2DPointSymbolsStyle",
+                name: "hospital"
+            }
+        }
     });
 
     map.addMany([roads,railroads,streams,lakes,utahCountyParcels,schoolsPreKto12,healthCareFacilities]);
