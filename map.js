@@ -187,7 +187,8 @@ require([
                     }
                 }
             ]
-        }
+        },
+        outFields: ["CARTOCODE"]
     });
     
     const railroads = new FeatureLayer({
@@ -325,7 +326,8 @@ require([
                 styleName: "Esri2DPointSymbolsStyle",
                 name: "school"
             }
-        }
+        },
+        outFields: ["OBJECTID"]
     });
 
     const healthCareFacilities = new FeatureLayer({
@@ -473,9 +475,124 @@ require([
             queryParcels.outFields = ["*"];
 
             utahCountyParcelsLayerView.queryFeatures(queryParcels).then((results) => {
-                const attribute = results.features[0].attributes;
+                const attribute = results.features[0].attributes["Average Market Value"];
                 console.log(attribute);
             });
+
+            const queryStreets = roadsLayerView.createQuery();
+            queryStreets.geometry = buffer;
+            queryStreets.outFields = ["*"];
+            queryStreets.returnGeometry = true;
+            roadsLayerView.queryFeatures(queryStreets).then((results) =>{
+                const features = results.features;
+                let streetScoreArray = [];
+                features.forEach(function(result,index){
+                    const streetGeometry = result.geometry;
+                    const streetDist = geometryEngine.distance(geometry,streetGeometry,"feet");
+                    console.log("street distance: ",streetDist)
+                    let streetScore;
+                    if(streetDist == 0){
+                        streetScore = 10;
+                    } else if(streetDist > 0 && streetDist <= 50){
+                        streetScore = 9;
+                    } else if(streetDist > 50 && streetDist <= 100){
+                        streetScore = 7;
+                    } else if(streetDist > 100 && streetDist <= 250){
+                        streetScore = 5;
+                    } else if(streetDist > 250 && streetDist <= 500){
+                        streetScore = 3;
+                    } else if(streetDist > 500 && streetDist <= 1000){
+                        streetScore = 1;
+                    } else {
+                        streetScore = 0;
+                    }
+
+                    streetScoreArray.push(streetScore);
+                });
+
+                const totalStreetScore = Math.max(...streetScoreArray);
+                console.log("Total Street Score: ",totalStreetScore);
+            });
+
+            const queryHighways = roadsLayerView.createQuery();
+            queryHighways.geometry = buffer;
+            queryHighways.outFields = ["8"];
+            queryHighways.returnGeometry = true;
+            queryHighways.where = "CARTOCODE IN ('1','2','3','4','5')";
+            roadsLayerView.queryFeatures(queryHighways).then((results)=>{
+                let highwayScoreArray = [];
+
+                if(results.length >= 1){
+                    const features = results.features;
+
+                    features.forEach(function(result,index){
+                        const highwayGeom = result.geometry;
+                        const highwayIntersect = geometryEngine.intersects(geometry,highwayGeom);
+                        
+                        let highwayScore;
+
+                        if(highwayIntersect){
+                            highwayScore = 10;
+                        } else {
+                            highwayScore = 0;
+                        };
+
+                        highwayScoreArray.push(highwayScore);
+                    });
+                } else {
+                    highwayScoreArray.push(0);
+                }
+
+                const totalHighwayScore = Math.max(...highwayScoreArray);
+                console.log("Total Highway Score: ",totalHighwayScore);
+            });
+
+            const queryRailroads = railroadsLayerView.createQuery();
+            queryRailroads.geometry = buffer;
+            queryRailroads.outFields = ["*"];
+            queryRailroads.returnGeometry = true;
+            railroadsLayerView.queryFeatures(queryRailroads).then((results)=>{
+                let railroadScoreArray = [];
+                if (results.length >= 1){
+
+                    const features = results.features;
+
+                    features.forEach(function(result,index){
+                        const railroadGeom = result.geometry;
+                        const railroadIntersect = geometryEngine.intersects(geometry,railroadGeom);
+                        
+                        let railroadScore;
+
+                        if(railroadIntersect){
+                            railroadScore = 10;
+                        } else {
+                            railroadScore = 0;
+                        };
+
+                        railroadScoreArray.push(railroadScore);
+                    });
+                } else {
+                    railroadScoreArray.push(0);
+                }
+                const totalRailroadScore = Math.max(...railroadScoreArray);
+                console.log("Total Railroad Score: ",totalRailroadScore);
+                
+            });
+
+            const querySchools = schoolsPreKto12LayerView.createQuery();
+            querySchools.geometry = buffer;
+            querySchools.outFields = ["*"];
+            querySchools.outStatistics = [
+                {
+                    onStatisticField: "OBJECTID",
+                    outStatisticFieldName: "Total Schools",
+                    statisticType: "count"
+                }
+            ];
+            schoolsPreKto12LayerView.queryFeatures(querySchools).then((results)=>{
+                const countSchools = results.features[0].attributes["Total Schools"];
+                console.log("Count of Schools: ",countSchools)
+            })
         }
     }
 });
