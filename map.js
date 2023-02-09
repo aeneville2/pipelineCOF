@@ -310,7 +310,8 @@ require([
                     color: "black"
                 }
             }
-        }
+        },
+        outFields: ["TOTAL_MKT_VALUE","PARCEL_ID"]
     });
 
     const schoolsPreKto12 = new FeatureLayer({
@@ -420,22 +421,61 @@ require([
     }
 
     let highlight;
+    let feature;
 
     view.on("click", function(event){
         const options = { include: miPipes };
         view.hitTest(event,options).then((response)=>{
-            if (highlight) {
+            if (highlight && feature) {
                 highlight.remove();
+                feature = null;
+                graphics.removeAll();
             }
             if(response.results.length){
                 
-                const feature = response.results.filter(function(result){
+                feature = response.results.filter(function(result){
                     return result.graphic.layer === miPipes;
                 })[0].graphic;
                 highlight = miPipesLayerView.highlight(feature);
+                return feature;
             } else if (response.results.length === 0){
-                highlight.remove()
+                highlight.remove();
+                feature = null;
+                graphics.removeAll();
             }
         })
-    })
+    });
+
+    document.getElementById("calculate").addEventListener("click",calculateFunction);
+
+    function calculateFunction(){
+        if (feature){
+            const geometry = feature.geometry;
+            const buffer = geometryEngine.buffer(geometry, 1000, "feet");
+            const bufferSym = {
+                type: "simple-fill",
+                color: [140,140,222,0.8]
+            };
+            graphics.add(new Graphic({
+                geometry: buffer,
+                symbol: bufferSym
+            }));
+
+            const queryParcels = utahCountyParcelsLayerView.createQuery();
+            queryParcels.outStatistics = [
+                {
+                    onStatisticField: "TOTAL_MKT_VALUE",
+                    outStatisticFieldName: "Average Market Value",
+                    statisticType: "avg"
+                }
+            ];
+            queryParcels.geometry = buffer;
+            queryParcels.outFields = ["*"];
+
+            utahCountyParcelsLayerView.queryFeatures(queryParcels).then((results) => {
+                const attribute = results.features[0].attributes;
+                console.log(attribute);
+            });
+        }
+    }
 });
