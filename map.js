@@ -7,8 +7,12 @@ require([
     "esri/widgets/Measurement",
     "esri/widgets/Print",
     "esri/widgets/Expand",
-    "esri/layers/FeatureLayer"
-], function(Map, MapView, BasemapGallery, Legend, LayerList, Measurement, Print, Expand, FeatureLayer){
+    "esri/layers/FeatureLayer",
+    "esri/geometry/geometryEngine",
+    "esri/layers/GraphicsLayer",
+    "esri/Graphic"
+], function(Map, MapView, BasemapGallery, Legend, LayerList, Measurement, Print, Expand, FeatureLayer,
+    geometryEngine, GraphicsLayer, Graphic){
     const map = new Map({
         basemap: "satellite"
     });
@@ -91,9 +95,9 @@ require([
 
     const miPipes = new FeatureLayer({
         url: "https://maps.cuwcd.com/arcgis/rest/services/testing/MIPipelinesCOF/MapServer/0",
-        popupTemplate: {
+        /*popupTemplate: {
             title: "M&I Pipes"
-        },
+        },*/
         definitionExpression: "facility_name = 'Alpine Aqueduct Reach 3'",
         title: "Alpine Aqueduct Reach 3 Pipelines"
     });
@@ -340,4 +344,98 @@ require([
     map.addMany([roads,railroads,streams,lakes,utahCountyParcels,schoolsPreKto12,healthCareFacilities]);
     
     map.add(miPipes,100);
+
+    const graphics = new GraphicsLayer({
+        title: "Graphics"
+    });
+    map.add(graphics);
+
+    let miPipesLayerView;
+    let roadsLayerView;
+    let railroadsLayerView;
+    let streamsLayerView;
+    let lakesLayerView;
+    let utahCountyParcelsLayerView;
+    let schoolsPreKto12LayerView;
+    let healthCareFacilitiesLayerView;
+
+    miPipes.when(()=>{
+        view.whenLayerView(miPipes).then(function(layerView){
+            miPipesLayerView = layerView;
+        });
+    })
+    .catch(errorCallback);
+
+    roads.when(()=>{
+        view.whenLayerView(roads).then(function(layerView){
+            roadsLayerView = layerView
+        })
+    })
+    .catch(errorCallback);
+
+    railroads.when(()=>{
+        view.whenLayerView(railroads).then(function(layerView){
+            railroadsLayerView = layerView
+        });
+    })
+    .catch(errorCallback);
+
+    streams.when(()=>{
+        view.whenLayerView(streams).then(function(layerView){
+            streamsLayerView = layerView;
+        });
+    })
+    .catch(errorCallback);
+
+    lakes.when(()=>{
+        view.whenLayerView(lakes).then(function(layerView){
+            lakesLayerView = layerView
+        })
+    })
+    .catch(errorCallback);
+
+    utahCountyParcels.when(()=>{
+        view.whenLayerView(utahCountyParcels).then(function(layerView){
+            utahCountyParcelsLayerView = layerView
+        });
+    })
+    .catch(errorCallback);
+
+    schoolsPreKto12.when(()=>{
+        view.whenLayerView(schoolsPreKto12).then(function(layerView){
+            schoolsPreKto12LayerView = layerView;
+        });
+    })
+    .catch(errorCallback);
+
+    healthCareFacilities.when(()=>{
+        view.whenLayerView(healthCareFacilities).then(function(layerView){
+            healthCareFacilitiesLayerView = layerView
+        })
+    })
+    .catch(errorCallback);
+
+    function errorCallback(error){
+        console.log("error happened: ",error.message);
+    }
+
+    let highlight;
+
+    view.on("click", function(event){
+        const options = { include: miPipes };
+        view.hitTest(event,options).then((response)=>{
+            if (highlight) {
+                highlight.remove();
+            }
+            if(response.results.length){
+                
+                const feature = response.results.filter(function(result){
+                    return result.graphic.layer === miPipes;
+                })[0].graphic;
+                highlight = miPipesLayerView.highlight(feature);
+            } else if (response.results.length === 0){
+                highlight.remove()
+            }
+        })
+    })
 });
