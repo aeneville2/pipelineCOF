@@ -104,6 +104,15 @@ require([
 
     const roads = new FeatureLayer({
         url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/UtahRoads/FeatureServer/0",
+        visible: true,
+        title: "Utah Roads",
+        outFields: ["CARTOCODE"],
+        opacity: 0,
+        legendEnabled: false
+    });
+
+    const roadsVisible = new FeatureLayer({
+        url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/UtahRoads/FeatureServer/0",
         visible: false,
         title: "Utah Roads",
         renderer: {
@@ -193,6 +202,14 @@ require([
     
     const railroads = new FeatureLayer({
         url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/UtahRailroads/FeatureServer/0",
+        visible: true,
+        title: "Utah Railroads",
+        opacity: 0,
+        legendEnabled: false
+    });
+
+    const railroadsVisible = new FeatureLayer({
+        url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/UtahRailroads/FeatureServer/0",
         visible: false,
         title: "Utah Railroads",
         renderer: {
@@ -207,6 +224,17 @@ require([
     });
 
     const streams = new FeatureLayer({
+        url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/UtahStreamsNHD/FeatureServer/0",
+        visible: true,
+        title: "Utah Streams",
+        definitionExpression: "FCode_Text IN ('Canal/Ditch', 'Canal/Ditch - Aqueduct', 'Stream/River', 'Stream/River - Ephemeral',"
+        + "'Stream/River - Intermittent', 'Stream/River - Perennial')",
+        outFields: ["FCode_Text"],
+        legendEnabled: false,
+        opacity: 0
+    });
+
+    const streamsVisible = new FeatureLayer({
         url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/UtahStreamsNHD/FeatureServer/0",
         visible: false,
         title: "Utah Streams",
@@ -300,6 +328,15 @@ require([
 
     const utahCountyParcels = new FeatureLayer({
         url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/Parcels_Utah_LIR/FeatureServer/0",
+        visible: true,
+        title: "Utah County Parcels",
+        opacity: 0,
+        legendEnabled: false,
+        outFields: ["TOTAL_MKT_VALUE","PARCEL_ID"]
+    });
+
+    const utahCountyParcelsVisible = new FeatureLayer({
+        url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/Parcels_Utah_LIR/FeatureServer/0",
         visible: false,
         title: "Utah County Parcels",
         renderer: {
@@ -318,6 +355,15 @@ require([
 
     const schoolsPreKto12 = new FeatureLayer({
         url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/Schools_PreKto12/FeatureServer/0",
+        visible: true,
+        title: "PreK to 12 Schools",
+        opacity: 0,
+        legendEnabled: false,
+        outFields: ["OBJECTID"]
+    });
+
+    const schoolsPreKto12Visible = new FeatureLayer({
+        url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/Schools_PreKto12/FeatureServer/0",
         visible: false,
         title: "PreK to 12 Schools",
         renderer: {
@@ -332,6 +378,16 @@ require([
     });
 
     const healthCareFacilities = new FeatureLayer({
+        url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/UtahHealthCareFacilities/FeatureServer/0",
+        visible: true,
+        title: "Health Care Facilities",
+        opacity: 0,
+        legendEnabled: false,
+        outFields: ["TYPE"],
+        definitionExpression: "TYPE = 'HOSPITAL'"
+    });
+
+    const healthCareFacilitiesVisible = new FeatureLayer({
         url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/UtahHealthCareFacilities/FeatureServer/0",
         visible: false,
         title: "Health Care Facilities",
@@ -348,6 +404,7 @@ require([
     });
 
     map.addMany([roads,railroads,streams,utahCountyParcels,schoolsPreKto12,healthCareFacilities]);
+    map.addMany([roadsVisible,railroadsVisible,streamsVisible,utahCountyParcelsVisible,schoolsPreKto12Visible,healthCareFacilitiesVisible]);
     
     map.add(miPipes,100);
 
@@ -455,13 +512,8 @@ require([
 
     function calculateFunction(){
         if (feature){
-            roads.visible = true;
-            railroads.visible = true;
-            streams.visible = true;
-            utahCountyParcels.visible = true;
-            schoolsPreKto12.visible = true;
-            healthCareFacilities.visible = true;
             
+
             const geometry = feature.geometry;
             const buffer = geometryEngine.buffer(geometry, 1000, "feet");
             const bufferSym = {
