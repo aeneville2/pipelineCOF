@@ -455,6 +455,13 @@ require([
 
     function calculateFunction(){
         if (feature){
+            roads.visible = true;
+            railroads.visible = true;
+            streams.visible = true;
+            utahCountyParcels.visible = true;
+            schoolsPreKto12.visible = true;
+            healthCareFacilities.visible = true;
+            
             const geometry = feature.geometry;
             const buffer = geometryEngine.buffer(geometry, 1000, "feet");
             const bufferSym = {
@@ -506,10 +513,10 @@ require([
             queryStreetsA.returnGeometry = true;
             queryStreetsA.where = "CARTOCODE IN ('1','2','3','4','5','6','7','8','9','10')"
             roadsLayerView.queryFeatures(queryStreetsA).then((results) =>{
-                console.log("Street A Query Length: ", results.length)
+                
                 let streetAScoreArray = [];
 
-                if (results){
+                if (results.features.length >= 1){
                     const features = results.features;
                     features.forEach(function(result,index){
                         const streetAGeometry = result.geometry;
@@ -551,7 +558,7 @@ require([
                 
                 let streetBScoreArray = [];
 
-                if(results){
+                if(results.features.length >= 1){
                     const features = results.features;
                     features.forEach(function(result,index){
                         const streetBGeometry = result.geometry;
@@ -588,7 +595,7 @@ require([
             roadsLayerView.queryFeatures(queryHighways).then((results)=>{
                 let highwayScoreArray = [];
 
-                if(results){
+                if(results.features.length >= 1){
                     const features = results.features;
 
                     features.forEach(function(result,index){
@@ -619,7 +626,7 @@ require([
             queryRailroads.returnGeometry = true;
             railroadsLayerView.queryFeatures(queryRailroads).then((results)=>{
                 let railroadScoreArray = [];
-                if (results){
+                if (results.features.length >= 1){
 
                     const features = results.features;
 
@@ -651,7 +658,7 @@ require([
             querySchools.returnGeometry = true;
             schoolsPreKto12LayerView.queryFeatures(querySchools).then((results)=>{
                 let schoolScoreArray = [];
-                if (results){
+                if (results.features.length >= 1){
                     const features = results.features;
                     features.forEach(function(result,index){
                         const schoolGeom = result.geometry;
@@ -688,7 +695,7 @@ require([
             queryHospitals.returnGeometry = true;
             healthCareFacilitiesLayerView.queryFeatures(queryHospitals).then((results)=>{
                 let hospitalScoreArray = [];
-                if (results){
+                if (results.features.length >= 1){
                     const features = results.features;
                     features.forEach(function(result,index){
                         const hospitalGeom = result.geometry;
@@ -762,7 +769,7 @@ require([
             querySeasonalStreams.where = "FCode_Text IN ('Canal/Ditch','Canal/Ditch - Aqueduct','Stream/River','Stream/River - Ephemeral','Stream/River - Intermittent')"
             streamsLayerView.queryFeatures(querySeasonalStreams).then((results)=>{
                 let seasonalStreamScoreArray = [];
-                if (results){
+                if (results.features.length >= 1){
 
                     const features = results.features;
 
@@ -795,7 +802,7 @@ require([
             queryPerennialStreams.where = "FCode_Text = 'Stream/River - Perennial'"
             streamsLayerView.queryFeatures(queryPerennialStreams).then((results)=>{
                 let perennialStreamScoreArray = [];
-                if (results.length >= 1){
+                if (results.features.length >= 1){
 
                     const features = results.features;
 
