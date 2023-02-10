@@ -17,15 +17,41 @@
     <div id="sidePanel">
         <h5>Information</h5>
         <p>Spot for information about the app.</p>
-        <h5>COF Score</h5>
-        <p><strong>Pipe Diameter:</strong>[score]</p>
-        <p><strong>Streets:</strong>[score]</p>
-        <p><strong>Critical Facility:</strong>[score]</p>
-        <p><strong>Mean Property Value:</strong>[score]</p>
-        <p><strong>Ease of Access:</strong>[score]</p>
-        <p><strong>Water Body Crossing:</strong>[score]</p>
-        <p><strong>Highway/Railroad:</strong>[score]</p>
-        <p><strong>Total:</strong>[score]</p>
+        <h5>COF Score for Selected Pipeline</h5>
+        <table>
+            <tr>
+                <td>Pipe Diameter</td>
+                <td id="pipeScore"></td>
+            </tr>
+            <tr>
+                <td>Streets</td>
+                <td id="streetScore"></td>
+            </tr>
+            <tr>
+                <td>Critical Facility</td>
+                <td id="criticalFacScore"></td>
+            </tr>
+            <tr>
+                <td>Mean Property Value</td>
+                <td id="propertyScore"></td>
+            </tr>
+            <tr>
+                <td>Ease of Access</td>
+                <td id="accessScore"></td>
+            </tr>
+            <tr>
+                <td>Water Body Crossing</td>
+                <td id="waterScore"></td>
+            </tr>
+            <tr>
+                <td>Highway or Railroad Crossing</td>
+                <td id="highwayRailroadScore"></td>
+            </tr>
+            <tr>
+                <td>Total COF Score</td>
+                <td id="totalScore"></td>
+            </tr>
+        </table>
         <button id="pastScores">Past Scores</button>
         <button id="calculate">Calculate Score</button>
         <button id="writeDB">Submit to DB</button>

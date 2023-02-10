@@ -516,13 +516,27 @@ require([
         })
     });
 
-    document.getElementById("calculate").addEventListener("click",calculateFunction);
+    document.getElementById("calculate").addEventListener("click",function () {
+        calculateFunction().then(calculateScore());
+    });
 
-    function calculateFunction(){
+    let pipeScore;
+    let propertyScore;
+    let totalStreetAScore;
+    let totalStreetBScore;
+    let totalHighwayScore;
+    let totalRailroadScore;
+    let totalSeasonalStreamScore;
+    let totalPerennialStreamScore;
+    let totalAccessScore;
+    let totalSchoolScore;
+    let totalHospitalScore;
+
+    async function calculateFunction(){
         if (feature){
             
             const pipeDiameter = feature.attributes["diameter_inches"];
-            let pipeScore;
+            //let pipeScore;
             if(pipeDiameter >= 84){
                 pipeScore = 10;
             } else if(pipeDiameter < 84 && pipeDiameter >= 60){
@@ -549,6 +563,7 @@ require([
                 symbol: bufferSym
             }));
 
+            
             const queryParcels = utahCountyParcelsLayerView.createQuery();
             queryParcels.outStatistics = [
                 {
@@ -560,10 +575,13 @@ require([
             queryParcels.geometry = buffer;
             queryParcels.outFields = ["*"];
 
-            utahCountyParcelsLayerView.queryFeatures(queryParcels).then((results) => {
+            //let propertyScore;
+            utahCountyParcelsLayerView.queryFeatures(queryParcels)
+            .then((results) => {
                 const attribute = results.features[0].attributes["Average Market Value"];
                 console.log("Average Market Value: ",attribute);
                 let propertyScore;
+                
                 if (attribute >= 1000000){
                     propertyScore = 10
                 } else if (attribute >= 500000 && attribute < 1000000){
@@ -581,8 +599,11 @@ require([
                 };
 
                 console.log("Property Score: ",propertyScore);
-            });
+                return propertyScore;
+            })
 
+
+            //let totalStreetAScore;
             const queryStreetsA = roadsLayerView.createQuery();
             queryStreetsA.geometry = buffer;
             queryStreetsA.outFields = ["*"];
@@ -621,10 +642,12 @@ require([
                     streetAScoreArray.push(0);
                 }
 
-                const totalStreetAScore = Math.max(...streetAScoreArray);
+                totalStreetAScore = Math.max(...streetAScoreArray);
                 console.log("Total Street A Score: ",totalStreetAScore);
+                return totalStreetAScore;
             });
 
+            //let totalStreetBScore;
             const queryStreetsB = roadsLayerView.createQuery();
             queryStreetsB.geometry = buffer;
             queryStreetsB.outFields = ["*"];
@@ -659,10 +682,14 @@ require([
                     streetBScoreArray.push(0);
                 };
 
-                const totalStreetBScore = Math.max(...streetBScoreArray);
+                totalStreetBScore = Math.max(...streetBScoreArray);
                 console.log("Total Street B Score: ",totalStreetBScore);
+                return totalStreetBScore;
             });
 
+            
+
+            //let totalHighwayScore;
             const queryHighways = roadsLayerView.createQuery();
             queryHighways.geometry = buffer;
             queryHighways.outFields = ["8"];
@@ -692,10 +719,12 @@ require([
                     highwayScoreArray.push(0);
                 }
 
-                const totalHighwayScore = Math.max(...highwayScoreArray);
+                totalHighwayScore = Math.max(...highwayScoreArray);
                 console.log("Total Highway Score: ",totalHighwayScore);
+                return totalHighwayScore;
             });
 
+            //let totalRailroadScore;
             const queryRailroads = railroadsLayerView.createQuery();
             queryRailroads.geometry = buffer;
             queryRailroads.outFields = ["*"];
@@ -723,11 +752,12 @@ require([
                 } else {
                     railroadScoreArray.push(0);
                 }
-                const totalRailroadScore = Math.max(...railroadScoreArray);
+                totalRailroadScore = Math.max(...railroadScoreArray);
                 console.log("Total Railroad Score: ",totalRailroadScore);
-                
+                return totalRailroadScore;
             });
 
+            //let totalSchoolScore;
             const querySchools = schoolsPreKto12LayerView.createQuery();
             querySchools.geometry = buffer;
             querySchools.outFields = ["*"];
@@ -761,10 +791,12 @@ require([
                 } else {
                     schoolScoreArray.push(0);
                 }
-                const totalSchoolScore = Math.max(...schoolScoreArray);
+                totalSchoolScore = Math.max(...schoolScoreArray);
                 console.log("Total School Score: ",totalSchoolScore);
+                return totalSchoolScore;
             });
 
+            //let totalHospitalScore;
             const queryHospitals = healthCareFacilitiesLayerView.createQuery();
             queryHospitals.geometry = buffer;
             queryHospitals.outFields = ["*"];
@@ -797,17 +829,22 @@ require([
                 } else {
                     hospitalScoreArray.push(0);
                 }
-                const totalHospitalScore = Math.max(...hospitalScoreArray);
+                totalHospitalScore = Math.max(...hospitalScoreArray);
                 console.log("Total Hospital Score: ",totalHospitalScore);
-            })
-            /*const queryAccess = roadsLayerView.createQuery();
+                return totalHospitalScore;
+            });
+
+            
+
+            //let totalAccessScore;
+            const queryAccess = roadsLayerView.createQuery();
             queryAccess.geometry = buffer;
             queryAccess.outFields = ["*"];
             queryAccess.returnGeometry = true;
             roadsLayerView.queryFeatures(queryAccess).then((results) =>{
                 
                 let accessScoreArray = [];
-                if (results.length>=1){
+                if (results.features.length >= 1){
                     const features = results.features;
                     features.forEach(function(result,index){
                         const accessGeometry = result.geometry;
@@ -824,20 +861,24 @@ require([
                             accessScore = 7;
                         } else if(accessDist > 200 && accessDist <= 350){
                             accessScore = 9;
-                        } else if(accessDist > 350 && accessDist <= 500){
+                        /*} else if(accessDist > 350 && accessDist <= 500){
+                            accessScore = 10;*/
+                        } else if(accessDist > 350) {
                             accessScore = 10;
                         }
 
                         accessScoreArray.push(accessScore);
                     });
                 } else {
-                    accessScoreArray.push(0);
+                    accessScoreArray.push(10);
                 }
 
-                const totalAccessScore = Math.max(...accessScoreArray);
+                totalAccessScore = Math.min(...accessScoreArray);
                 console.log("Total Access Score: ",totalAccessScore);
-            });*/
+                return totalAccessScore;
+            });
 
+            //let totalSeasonalStreamScore;
             const querySeasonalStreams = streamsLayerView.createQuery();
             querySeasonalStreams.geometry = buffer;
             querySeasonalStreams.outFields = ["*"];
@@ -867,11 +908,13 @@ require([
                 } else {
                     seasonalStreamScoreArray.push(0);
                 }
-                const totalSeasonalStreamScore = Math.max(...seasonalStreamScoreArray);
+                totalSeasonalStreamScore = Math.max(...seasonalStreamScoreArray);
                 console.log("Total Seasonal Stream Score: ",totalSeasonalStreamScore);
+                return totalSeasonalStreamScore;
                 
             });
 
+            //let totalPerennialStreamScore;
             const queryPerennialStreams = streamsLayerView.createQuery();
             queryPerennialStreams.geometry = buffer;
             queryPerennialStreams.outFields = ["*"];
@@ -900,10 +943,34 @@ require([
                 } else {
                     perennialStreamScoreArray.push(0);
                 }
-                const totalPerennialStreamScore = Math.max(...perennialStreamScoreArray);
+                totalPerennialStreamScore = Math.max(...perennialStreamScoreArray);
                 console.log("Total Perennial Stream Score: ",totalPerennialStreamScore);
+                return totalPerennialStreamScore;
                 
             });
+            console.log("Total Stream Score Outside: ",totalPerennialStreamScore)
+
         }
+    }
+   
+
+    function calculateScore(){
+        console.log("total school score: ",totalSchoolScore)
+        let totalCriticalFacScore = Math.max(totalSchoolScore,totalHospitalScore);
+        console.log("Criticial Facility Score: ",totalCriticalFacScore);
+        let totalWaterScore = Math.max(totalSeasonalStreamScore,totalPerennialStreamScore);
+        let totalHighwayRailroadScore = Math.max(totalHighwayScore,totalRailroadScore);
+        let totalStreetScore = Math.max(totalStreetAScore,totalStreetBScore);
+
+        document.getElementById("pipeScore").innerText = pipeScore;
+        document.getElementById("streetScore").innerText = totalStreetScore;
+        document.getElementById("criticalFacScore").innerText = totalCriticalFacScore;
+        document.getElementById("propertyScore").innerText = propertyScore;
+        document.getElementById("accessScore").innerText = totalAccessScore;
+        document.getElementById("waterScore").innerText = totalWaterScore;
+        document.getElementById("highwayRailroadScore").innerText = totalHighwayRailroadScore;
+
+        let totalCOFScore = (pipeScore*0.2) + (totalStreetScore*0.2) + (totalCriticalFacScore*0.2) + (propertyScore*0.2) + (totalAccessScore*0.1) + (totalWaterScore*0.09) + (totalHighwayRailroadScore*0.01)
+        document.getElementById("totalScore").innerText = totalCOFScore;
     }
 });
