@@ -108,7 +108,8 @@ require([
         title: "Utah Roads",
         outFields: ["CARTOCODE"],
         opacity: 0,
-        legendEnabled: false
+        legendEnabled: false,
+        listMode: "hide"
     });
 
     const roadsVisible = new FeatureLayer({
@@ -205,7 +206,8 @@ require([
         visible: true,
         title: "Utah Railroads",
         opacity: 0,
-        legendEnabled: false
+        legendEnabled: false,
+        listMode: "hide"
     });
 
     const railroadsVisible = new FeatureLayer({
@@ -231,7 +233,8 @@ require([
         + "'Stream/River - Intermittent', 'Stream/River - Perennial')",
         outFields: ["FCode_Text"],
         legendEnabled: false,
-        opacity: 0
+        opacity: 0,
+        listMode: "hide"
     });
 
     const streamsVisible = new FeatureLayer({
@@ -332,7 +335,8 @@ require([
         title: "Utah County Parcels",
         opacity: 0,
         legendEnabled: false,
-        outFields: ["TOTAL_MKT_VALUE","PARCEL_ID"]
+        outFields: ["TOTAL_MKT_VALUE","PARCEL_ID"],
+        listMode: "hide"
     });
 
     const utahCountyParcelsVisible = new FeatureLayer({
@@ -359,7 +363,8 @@ require([
         title: "PreK to 12 Schools",
         opacity: 0,
         legendEnabled: false,
-        outFields: ["OBJECTID"]
+        outFields: ["OBJECTID"],
+        listMode: "hide"
     });
 
     const schoolsPreKto12Visible = new FeatureLayer({
@@ -384,7 +389,8 @@ require([
         opacity: 0,
         legendEnabled: false,
         outFields: ["TYPE"],
-        definitionExpression: "TYPE = 'HOSPITAL'"
+        definitionExpression: "TYPE = 'HOSPITAL'",
+        listMode: "hide"
     });
 
     const healthCareFacilitiesVisible = new FeatureLayer({
@@ -818,7 +824,8 @@ require([
             querySeasonalStreams.geometry = buffer;
             querySeasonalStreams.outFields = ["*"];
             querySeasonalStreams.returnGeometry = true;
-            querySeasonalStreams.where = "FCode_Text IN ('Canal/Ditch','Canal/Ditch - Aqueduct','Stream/River','Stream/River - Ephemeral','Stream/River - Intermittent')"
+            querySeasonalStreams.where = "FCode_Text IN ('Canal/Ditch', 'Canal/Ditch - Aqueduct', 'Stream/River', 'Stream/River - Ephemeral',"
+            + "'Stream/River - Intermittent')"
             streamsLayerView.queryFeatures(querySeasonalStreams).then((results)=>{
                 let seasonalStreamScoreArray = [];
                 if (results.features.length >= 1){
