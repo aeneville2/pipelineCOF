@@ -99,7 +99,8 @@ require([
             title: "M&I Pipes"
         },*/
         definitionExpression: "facility_name = 'Alpine Aqueduct Reach 3'",
-        title: "Alpine Aqueduct Reach 3 Pipelines"
+        title: "Alpine Aqueduct Reach 3 Pipelines",
+        outFields: ["*"]
     });
 
     const roads = new FeatureLayer({
@@ -500,12 +501,13 @@ require([
                 graphics.removeAll();
             }
             if(response.results.length){
-                
                 feature = response.results.filter(function(result){
                     return result.graphic.layer === miPipes;
                 })[0].graphic;
                 highlight = miPipesLayerView.highlight(feature);
+
                 return feature;
+
             } else if (response.results.length === 0){
                 highlight.remove();
                 feature = null;
@@ -519,6 +521,22 @@ require([
     function calculateFunction(){
         if (feature){
             
+            const pipeDiameter = feature.attributes["diameter_inches"];
+            let pipeScore;
+            if(pipeDiameter >= 84){
+                pipeScore = 10;
+            } else if(pipeDiameter < 84 && pipeDiameter >= 60){
+                pipeScore = 9;
+            } else if (pipeDiameter < 60 && pipeDiameter >= 43){
+                pipeScore = 7;
+            } else if (pipeDiameter < 43 && pipeDiameter >= 24){
+                pipeScore = 5;
+            } else if (pipeDiameter < 24 && pipeDiameter >= 12){
+                pipeScore = 3;
+            } else if (pipeDiameter < 12){
+                pipeScore = 1;
+            }
+            console.log("Pipe Score: ", pipeScore);
 
             const geometry = feature.geometry;
             const buffer = geometryEngine.buffer(geometry, 1000, "feet");
