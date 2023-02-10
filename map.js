@@ -658,7 +658,7 @@ require([
 
                     features.forEach(function(result,index){
                         const highwayGeom = result.geometry;
-                        const highwayIntersect = geometryEngine.intersects(geometry,highwayGeom);
+                        const highwayIntersect = geometryEngine.crosses(geometry,highwayGeom);
                         
                         let highwayScore;
 
@@ -690,7 +690,7 @@ require([
 
                     features.forEach(function(result,index){
                         const railroadGeom = result.geometry;
-                        const railroadIntersect = geometryEngine.intersects(geometry,railroadGeom);
+                        const railroadIntersect = geometryEngine.crosses(geometry,railroadGeom);
                         
                         let railroadScore;
 
@@ -834,7 +834,7 @@ require([
 
                     features.forEach(function(result,index){
                         const seasonalStreamGeom = result.geometry;
-                        const seasonalStreamIntersect = geometryEngine.intersects(geometry,seasonalStreamGeom);
+                        const seasonalStreamIntersect = geometryEngine.crosses(geometry,seasonalStreamGeom);
                         
                         let seasonalStreamScore;
 
@@ -867,7 +867,7 @@ require([
 
                     features.forEach(function(result,index){
                         const perennialStreamGeom = result.geometry;
-                        const perennialStreamIntersect = geometryEngine.intersects(geometry,perennialStreamGeom);
+                        const perennialStreamIntersect = geometryEngine.crosses(geometry,perennialStreamGeom);
                         
                         let perennialStreamScore;
 
