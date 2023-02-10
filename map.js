@@ -212,6 +212,7 @@ require([
         title: "Utah Streams",
         definitionExpression: "FCode_Text IN ('Canal/Ditch', 'Canal/Ditch - Aqueduct', 'Stream/River', 'Stream/River - Ephemeral',"
         + "'Stream/River - Intermittent', 'Stream/River - Perennial')",
+        outFields: ["FCode_Text"],
         renderer: {
             type: "unique-value",
             field: "FCode_Text",
@@ -280,7 +281,7 @@ require([
         }
     });
 
-    const lakes = new FeatureLayer({
+    /*const lakes = new FeatureLayer({
         url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/UtahLakesNHD/FeatureServer/0",
         visible: false,
         title: "Utah Lakes",
@@ -295,7 +296,7 @@ require([
                 }
             }
         }
-    });
+    });*/
 
     const utahCountyParcels = new FeatureLayer({
         url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/Parcels_Utah_LIR/FeatureServer/0",
@@ -341,10 +342,12 @@ require([
                 styleName: "Esri2DPointSymbolsStyle",
                 name: "hospital"
             }
-        }
+        },
+        outFields: ["TYPE"],
+        definitionExpression: "TYPE = 'HOSPITAL'"
     });
 
-    map.addMany([roads,railroads,streams,lakes,utahCountyParcels,schoolsPreKto12,healthCareFacilities]);
+    map.addMany([roads,railroads,streams,utahCountyParcels,schoolsPreKto12,healthCareFacilities]);
     
     map.add(miPipes,100);
 
@@ -357,7 +360,7 @@ require([
     let roadsLayerView;
     let railroadsLayerView;
     let streamsLayerView;
-    let lakesLayerView;
+    //let lakesLayerView;
     let utahCountyParcelsLayerView;
     let schoolsPreKto12LayerView;
     let healthCareFacilitiesLayerView;
@@ -390,12 +393,12 @@ require([
     })
     .catch(errorCallback);
 
-    lakes.when(()=>{
+    /*lakes.when(()=>{
         view.whenLayerView(lakes).then(function(layerView){
             lakesLayerView = layerView
         })
     })
-    .catch(errorCallback);
+    .catch(errorCallback);*/
 
     utahCountyParcels.when(()=>{
         view.whenLayerView(utahCountyParcels).then(function(layerView){
@@ -476,42 +479,105 @@ require([
 
             utahCountyParcelsLayerView.queryFeatures(queryParcels).then((results) => {
                 const attribute = results.features[0].attributes["Average Market Value"];
-                console.log(attribute);
+                console.log("Average Market Value: ",attribute);
+                let propertyScore;
+                if (attribute >= 1000000){
+                    propertyScore = 10
+                } else if (attribute >= 500000 && attribute < 1000000){
+                    propertyScore = 9;
+                } else if (attribute >= 375000 && attribute < 500000){
+                    propertyScore = 7;
+                } else if (attribute >= 250000 && attribute < 375000){
+                    propertyScore = 5;
+                } else if (attribute >= 125000 && attribute < 250000){
+                    propertyScore = 3;
+                } else if (attribute >= 0 && attribute < 125000){
+                    propertyScore = 1;
+                } else {
+                    propertyScore = 0;
+                };
+
+                console.log("Property Score: ",propertyScore);
             });
 
-            const queryStreets = roadsLayerView.createQuery();
-            queryStreets.geometry = buffer;
-            queryStreets.outFields = ["*"];
-            queryStreets.returnGeometry = true;
-            roadsLayerView.queryFeatures(queryStreets).then((results) =>{
-                const features = results.features;
-                let streetScoreArray = [];
-                features.forEach(function(result,index){
-                    const streetGeometry = result.geometry;
-                    const streetDist = geometryEngine.distance(geometry,streetGeometry,"feet");
-                    console.log("street distance: ",streetDist)
-                    let streetScore;
-                    if(streetDist == 0){
-                        streetScore = 10;
-                    } else if(streetDist > 0 && streetDist <= 50){
-                        streetScore = 9;
-                    } else if(streetDist > 50 && streetDist <= 100){
-                        streetScore = 7;
-                    } else if(streetDist > 100 && streetDist <= 250){
-                        streetScore = 5;
-                    } else if(streetDist > 250 && streetDist <= 500){
-                        streetScore = 3;
-                    } else if(streetDist > 500 && streetDist <= 1000){
-                        streetScore = 1;
-                    } else {
-                        streetScore = 0;
-                    }
+            const queryStreetsA = roadsLayerView.createQuery();
+            queryStreetsA.geometry = buffer;
+            queryStreetsA.outFields = ["*"];
+            queryStreetsA.returnGeometry = true;
+            queryStreetsA.where = "CARTOCODE IN ('1','2','3','4','5','6','7','8','9','10')"
+            roadsLayerView.queryFeatures(queryStreetsA).then((results) =>{
+                console.log("Street A Query Length: ", results.length)
+                let streetAScoreArray = [];
 
-                    streetScoreArray.push(streetScore);
-                });
+                if (results){
+                    const features = results.features;
+                    features.forEach(function(result,index){
+                        const streetAGeometry = result.geometry;
+                        const streetADist = geometryEngine.distance(geometry,streetAGeometry,"feet");
+                        console.log("street A distance: ",streetADist)
+                        let streetAScore;
+                        if(streetADist == 0){
+                            streetAScore = 10;
+                        } else if(streetADist > 0 && streetADist < 50){
+                            streetAScore = 9;
+                        } else if(streetADist >= 50 && streetADist < 100){
+                            streetAScore = 7;
+                        } else if(streetADist >= 100 && streetADist < 250){
+                            streetAScore = 5;
+                        } else if(streetADist >= 250 && streetADist < 500){
+                            streetAScore = 3;
+                        } else if(streetADist >= 500 && streetADist < 1000){
+                            streetAScore = 1;
+                        } else {
+                            streetAScore = 0;
+                        }
 
-                const totalStreetScore = Math.max(...streetScoreArray);
-                console.log("Total Street Score: ",totalStreetScore);
+                        streetAScoreArray.push(streetAScore);
+                    });
+                } else {
+                    streetAScoreArray.push(0);
+                }
+
+                const totalStreetAScore = Math.max(...streetAScoreArray);
+                console.log("Total Street A Score: ",totalStreetAScore);
+            });
+
+            const queryStreetsB = roadsLayerView.createQuery();
+            queryStreetsB.geometry = buffer;
+            queryStreetsB.outFields = ["*"];
+            queryStreetsB.returnGeometry = true;
+            queryStreetsB.where = "CARTOCODE IN ('11','12','13','14','15','16','17','18','99')"
+            roadsLayerView.queryFeatures(queryStreetsB).then((results) =>{
+                
+                let streetBScoreArray = [];
+
+                if(results){
+                    const features = results.features;
+                    features.forEach(function(result,index){
+                        const streetBGeometry = result.geometry;
+                        const streetBDist = geometryEngine.distance(geometry,streetBGeometry,"feet");
+                        console.log("street B distance: ",streetBDist)
+                        let streetBScore;
+                        if(streetBDist == 0){
+                            streetBScore = 7;
+                        } else if(streetBDist > 0 && streetBDist < 50){
+                            streetBScore = 5;
+                        } else if(streetBDist >= 50 && streetBDist < 100){
+                            streetBScore = 3;
+                        } else if(streetBDist >= 100 && streetBDist < 500){
+                            streetBScore = 1;
+                        } else {
+                            streetBScore = 0;
+                        }
+    
+                        streetBScoreArray.push(streetBScore);
+                    });
+                } else {
+                    streetBScoreArray.push(0);
+                };
+
+                const totalStreetBScore = Math.max(...streetBScoreArray);
+                console.log("Total Street B Score: ",totalStreetBScore);
             });
 
             const queryHighways = roadsLayerView.createQuery();
@@ -522,7 +588,7 @@ require([
             roadsLayerView.queryFeatures(queryHighways).then((results)=>{
                 let highwayScoreArray = [];
 
-                if(results.length >= 1){
+                if(results){
                     const features = results.features;
 
                     features.forEach(function(result,index){
@@ -553,7 +619,7 @@ require([
             queryRailroads.returnGeometry = true;
             railroadsLayerView.queryFeatures(queryRailroads).then((results)=>{
                 let railroadScoreArray = [];
-                if (results.length >= 1){
+                if (results){
 
                     const features = results.features;
 
@@ -582,17 +648,178 @@ require([
             const querySchools = schoolsPreKto12LayerView.createQuery();
             querySchools.geometry = buffer;
             querySchools.outFields = ["*"];
-            querySchools.outStatistics = [
-                {
-                    onStatisticField: "OBJECTID",
-                    outStatisticFieldName: "Total Schools",
-                    statisticType: "count"
-                }
-            ];
+            querySchools.returnGeometry = true;
             schoolsPreKto12LayerView.queryFeatures(querySchools).then((results)=>{
-                const countSchools = results.features[0].attributes["Total Schools"];
-                console.log("Count of Schools: ",countSchools)
+                let schoolScoreArray = [];
+                if (results){
+                    const features = results.features;
+                    features.forEach(function(result,index){
+                        const schoolGeom = result.geometry;
+                        const schoolDist = geometryEngine.distance(geometry, schoolGeom, "feet");
+                        console.log("School Distance: ",schoolDist);
+                        let schoolScore;
+                        if (schoolDist < 100){
+                            schoolScore = 10;
+                        } else if (schoolDist >= 100 && schoolDist < 150){
+                            schoolScore = 9;
+                        } else if (schoolDist >= 150 && schoolDist < 200){
+                            schoolScore = 7;
+                        } else if (schoolDist >= 200 && schoolDist < 300){
+                            schoolScore = 5;
+                        } else if (schoolDist >= 300 && schoolDist < 500){
+                            schoolScore = 3;
+                        } else if (schoolDist >= 500 && schoolDist < 1000){
+                            schoolScore = 1;
+                        } else {
+                            schoolScore = 0;
+                        }
+                        schoolScoreArray.push(schoolScore);
+                    })
+                } else {
+                    schoolScoreArray.push(0);
+                }
+                const totalSchoolScore = Math.max(...schoolScoreArray);
+                console.log("Total School Score: ",totalSchoolScore);
+            });
+
+            const queryHospitals = healthCareFacilitiesLayerView.createQuery();
+            queryHospitals.geometry = buffer;
+            queryHospitals.outFields = ["*"];
+            queryHospitals.returnGeometry = true;
+            healthCareFacilitiesLayerView.queryFeatures(queryHospitals).then((results)=>{
+                let hospitalScoreArray = [];
+                if (results){
+                    const features = results.features;
+                    features.forEach(function(result,index){
+                        const hospitalGeom = result.geometry;
+                        const hospitalDist = geometryEngine.distance(geometry, hospitalGeom, "feet");
+                        let hospitalScore;
+                        if (hospitalDist < 100){
+                            hospitalScore = 10;
+                        } else if (hospitalDist >= 100 && hospitalDist < 150){
+                            hospitalScore = 9;
+                        } else if (hospitalDist >= 150 && hospitalDist < 200){
+                            hospitalScore = 7;
+                        } else if (hospitalDist >= 200 && hospitalDist < 300){
+                            hospitalScore = 5;
+                        } else if (hospitalDist >= 300 && hospitalDist < 500){
+                            hospitalScore = 3;
+                        } else if (hospitalDist >= 500 && hospitalDist < 1000){
+                            hospitalScore = 1;
+                        } else {
+                            hospitalScore = 0;
+                        }
+                        hospitalScoreArray.push(hospitalScore);
+                    })
+                } else {
+                    hospitalScoreArray.push(0);
+                }
+                const totalHospitalScore = Math.max(...hospitalScoreArray);
+                console.log("Total Hospital Score: ",totalHospitalScore);
             })
+            /*const queryAccess = roadsLayerView.createQuery();
+            queryAccess.geometry = buffer;
+            queryAccess.outFields = ["*"];
+            queryAccess.returnGeometry = true;
+            roadsLayerView.queryFeatures(queryAccess).then((results) =>{
+                
+                let accessScoreArray = [];
+                if (results.length>=1){
+                    const features = results.features;
+                    features.forEach(function(result,index){
+                        const accessGeometry = result.geometry;
+                        const accessDist = geometryEngine.distance(geometry,accessGeometry,"feet");
+                        console.log("Access distance: ",accessDist)
+                        let accessScore;
+                        if(accessDist == 0){
+                            accessScore = 1;
+                        } else if(accessDist > 0 && accessDist <= 50){
+                            accessScore = 3;
+                        } else if(accessDist > 50 && accessDist <= 100){
+                            accessScore = 5;
+                        } else if(accessDist > 100 && accessDist <= 200){
+                            accessScore = 7;
+                        } else if(accessDist > 200 && accessDist <= 350){
+                            accessScore = 9;
+                        } else if(accessDist > 350 && accessDist <= 500){
+                            accessScore = 10;
+                        }
+
+                        accessScoreArray.push(accessScore);
+                    });
+                } else {
+                    accessScoreArray.push(0);
+                }
+
+                const totalAccessScore = Math.max(...accessScoreArray);
+                console.log("Total Access Score: ",totalAccessScore);
+            });*/
+
+            const querySeasonalStreams = streamsLayerView.createQuery();
+            querySeasonalStreams.geometry = buffer;
+            querySeasonalStreams.outFields = ["*"];
+            querySeasonalStreams.returnGeometry = true;
+            querySeasonalStreams.where = "FCode_Text IN ('Canal/Ditch','Canal/Ditch - Aqueduct','Stream/River','Stream/River - Ephemeral','Stream/River - Intermittent')"
+            streamsLayerView.queryFeatures(querySeasonalStreams).then((results)=>{
+                let seasonalStreamScoreArray = [];
+                if (results){
+
+                    const features = results.features;
+
+                    features.forEach(function(result,index){
+                        const seasonalStreamGeom = result.geometry;
+                        const seasonalStreamIntersect = geometryEngine.intersects(geometry,seasonalStreamGeom);
+                        
+                        let seasonalStreamScore;
+
+                        if(seasonalStreamIntersect){
+                            seasonalStreamScore = 7;
+                        } else {
+                            seasonalStreamScore = 0;
+                        };
+
+                        seasonalStreamScoreArray.push(seasonalStreamScore);
+                    });
+                } else {
+                    seasonalStreamScoreArray.push(0);
+                }
+                const totalSeasonalStreamScore = Math.max(...seasonalStreamScoreArray);
+                console.log("Total Seasonal Stream Score: ",totalSeasonalStreamScore);
+                
+            });
+
+            const queryPerennialStreams = streamsLayerView.createQuery();
+            queryPerennialStreams.geometry = buffer;
+            queryPerennialStreams.outFields = ["*"];
+            queryPerennialStreams.returnGeometry = true;
+            queryPerennialStreams.where = "FCode_Text = 'Stream/River - Perennial'"
+            streamsLayerView.queryFeatures(queryPerennialStreams).then((results)=>{
+                let perennialStreamScoreArray = [];
+                if (results.length >= 1){
+
+                    const features = results.features;
+
+                    features.forEach(function(result,index){
+                        const perennialStreamGeom = result.geometry;
+                        const perennialStreamIntersect = geometryEngine.intersects(geometry,perennialStreamGeom);
+                        
+                        let perennialStreamScore;
+
+                        if(perennialStreamIntersect){
+                            perennialStreamScore = 9;
+                        } else {
+                            perennialStreamScore = 0;
+                        };
+
+                        perennialStreamScoreArray.push(perennialStreamScore);
+                    });
+                } else {
+                    perennialStreamScoreArray.push(0);
+                }
+                const totalPerennialStreamScore = Math.max(...perennialStreamScoreArray);
+                console.log("Total Perennial Stream Score: ",totalPerennialStreamScore);
+                
+            });
         }
     }
 });
