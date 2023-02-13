@@ -40,14 +40,14 @@ body {
 #sidePanel p{
     font-size: 12px;
     margin-left: 10px;
-    text-align: left;
+    text-align: center;
 }
 
 table, td {
     border: 1px solid black;
     border-collapse: collapse;
     text-align: left;
-    font-size: 8px;
+    font-size: 12px;
 }
 
 #sidePanel button{

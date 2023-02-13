@@ -495,7 +495,22 @@ require([
     view.on("click", function(event){
         const options = { include: miPipes };
         view.hitTest(event,options).then((response)=>{
+            document.getElementById("pipeScore").innerText = "";
             
+            document.getElementById("propertyScore").innerText = "";
+            
+            document.getElementById("streetScore").innerText = "";
+            
+            document.getElementById("highwayRailroadScore").innerText = "";
+            
+            document.getElementById("criticalFacScore").innerText = "";
+            
+            document.getElementById("accessScore").innerText = "";
+            
+            document.getElementById("waterScore").innerText = "";
+            
+            document.getElementById("totalScore").innerText = "";
+
             if(response.results.length){
                 if (highlight && feature) {
                     highlight.remove();
