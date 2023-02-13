@@ -495,12 +495,13 @@ require([
     view.on("click", function(event){
         const options = { include: miPipes };
         view.hitTest(event,options).then((response)=>{
-            if (highlight && feature) {
-                highlight.remove();
-                feature = null;
-                graphics.removeAll();
-            }
+            
             if(response.results.length){
+                if (highlight && feature) {
+                    highlight.remove();
+                    feature = null;
+                    graphics.removeAll();
+                }
                 feature = response.results.filter(function(result){
                     return result.graphic.layer === miPipes;
                 })[0].graphic;
@@ -509,18 +510,508 @@ require([
                 return feature;
 
             } else if (response.results.length === 0){
-                highlight.remove();
-                feature = null;
-                graphics.removeAll();
+                if (highlight && feature) {
+                    highlight.remove();
+                    feature = null;
+                    graphics.removeAll();
+                }
             }
         })
     });
 
-    document.getElementById("calculate").addEventListener("click",function () {
+    /*document.getElementById("calculate").addEventListener("click",function () {
         calculateFunction().then(calculateScore());
+    });*/
+
+    document.getElementById("calculate").addEventListener("click",function(){
+        //calculateFunction().then(calculateScore());
+        calculateFunction()
     });
 
     let pipeScore;
+    var propertyScoreArray = [];
+    var streetAScoreArray = [];
+    var streetBScoreArray = [];
+    var highwayScoreArray = [];
+    var railroadScoreArray = [];
+    var schoolScoreArray = [];
+    var hospitalScoreArray = [];
+    var accessScoreArray = [];
+    var seasonalStreamScoreArray = [];
+    var perennialStreamScoreArray = [];
+
+    async function calculateFunction(){
+        if (feature){
+            const geometry = feature.geometry;
+            const buffer = geometryEngine.buffer(geometry, 1000, "feet");
+            const bufferSym = {
+                type: "simple-fill",
+                color: [140,140,222,0.8]
+            };
+            graphics.add(new Graphic({
+                geometry: buffer,
+                symbol: bufferSym
+            }));
+
+            const pipeDiameter = feature.attributes["diameter_inches"];
+            if(pipeDiameter >= 84){
+                pipeScore = 10;
+            } else if(pipeDiameter < 84 && pipeDiameter >= 60){
+                pipeScore = 9;
+            } else if (pipeDiameter < 60 && pipeDiameter >= 43){
+                pipeScore = 7;
+            } else if (pipeDiameter < 43 && pipeDiameter >= 24){
+                pipeScore = 5;
+            } else if (pipeDiameter < 24 && pipeDiameter >= 12){
+                pipeScore = 3;
+            } else if (pipeDiameter < 12){
+                pipeScore = 1;
+            } else {
+                pipeScore = "No Diameter"
+            }
+
+            await propertyScore(buffer);
+            await streetAScore(geometry,buffer);
+            await streetBScore(geometry,buffer);
+            await highwayScore(geometry,buffer);
+            await railroadScore(geometry,buffer);
+            await schoolScore(geometry,buffer);
+            await hospitalScore(geometry,buffer);
+            await accessScore(geometry,buffer);
+            await seasonalStreamScore(geometry,buffer);
+            await perennialStreamScore(geometry,buffer);
+            Promise.all([propertyScore,streetAScore,streetBScore,
+            highwayScore,railroadScore,schoolScore,hospitalScore,
+        accessScore,seasonalStreamScore,perennialStreamScore]).then(()=>{calculateScore()})
+            
+        }
+    }
+
+    async function propertyScore(buffer){
+        const queryParcels = utahCountyParcelsLayerView.createQuery();
+        queryParcels.outStatistics = [
+            {
+                onStatisticField: "TOTAL_MKT_VALUE",
+                outStatisticFieldName: "Average Market Value",
+                statisticType: "avg"
+            }
+        ];
+        queryParcels.geometry = buffer;
+        queryParcels.outFields = ["*"];
+
+        await utahCountyParcelsLayerView.queryFeatures(queryParcels)
+            .then((results) => {
+                const attribute = results.features[0].attributes["Average Market Value"];
+                console.log("Average Market Value: ",attribute);
+                let propertyScore;
+                
+                if (attribute >= 1000000){
+                    propertyScore = 10
+                } else if (attribute >= 500000 && attribute < 1000000){
+                    propertyScore = 9;
+                } else if (attribute >= 375000 && attribute < 500000){
+                    propertyScore = 7;
+                } else if (attribute >= 250000 && attribute < 375000){
+                    propertyScore = 5;
+                } else if (attribute >= 125000 && attribute < 250000){
+                    propertyScore = 3;
+                } else if (attribute >= 0 && attribute < 125000){
+                    propertyScore = 1;
+                } else {
+                    propertyScore = 0;
+                };
+
+                propertyScoreArray = [];
+                propertyScoreArray.push(propertyScore);
+                console.log("PropertyScoreArray in Promise: ",propertyScoreArray[0]);
+                
+            });   
+    }
+
+    async function streetAScore(geometry,buffer){
+        const queryStreetsA = roadsLayerView.createQuery();
+        queryStreetsA.geometry = buffer;
+        queryStreetsA.outFields = ["*"];
+        queryStreetsA.returnGeometry = true;
+        queryStreetsA.where = "CARTOCODE IN ('1','2','3','4','5','6','7','8','9','10')"
+        await roadsLayerView.queryFeatures(queryStreetsA).then((results) =>{
+            let streetScoreArray = [];
+            if (results.features.length >= 1){
+                const features = results.features;
+                features.forEach(function(result,index){
+                    const streetAGeometry = result.geometry;
+                    const streetADist = geometryEngine.distance(geometry,streetAGeometry,"feet");
+                    console.log("street A distance: ",streetADist)
+                    let streetAScore;
+                    if(streetADist == 0){
+                        streetAScore = 10;
+                    } else if(streetADist > 0 && streetADist < 50){
+                        streetAScore = 9;
+                    } else if(streetADist >= 50 && streetADist < 100){
+                        streetAScore = 7;
+                    } else if(streetADist >= 100 && streetADist < 250){
+                        streetAScore = 5;
+                    } else if(streetADist >= 250 && streetADist < 500){
+                        streetAScore = 3;
+                    } else if(streetADist >= 500 && streetADist < 1000){
+                        streetAScore = 1;
+                    } else {
+                        streetAScore = 0;
+                    }
+
+                    streetScoreArray.push(streetAScore);
+                });
+            } else {
+                streetScoreArray.push(0);
+            }
+
+            streetAScoreArray = [];
+            let streetAScoreMax = Math.max(...streetScoreArray)
+            streetAScoreArray.push(streetAScoreMax);
+            
+            console.log("Total Street A Score: ",streetAScoreArray[0]);
+            
+        });
+    }
+
+    async function streetBScore(geometry,buffer){
+        const queryStreetsB = roadsLayerView.createQuery();
+        queryStreetsB.geometry = buffer;
+        queryStreetsB.outFields = ["*"];
+        queryStreetsB.returnGeometry = true;
+        queryStreetsB.where = "CARTOCODE IN ('11','12','13','14','15','16','17','18','99')"
+        await roadsLayerView.queryFeatures(queryStreetsB).then((results) =>{
+            let streetScoreArray = [];
+            if(results.features.length >= 1){
+                const features = results.features;
+                features.forEach(function(result,index){
+                    const streetBGeometry = result.geometry;
+                    const streetBDist = geometryEngine.distance(geometry,streetBGeometry,"feet");
+                    console.log("street B distance: ",streetBDist)
+                    let streetBScore;
+                    if(streetBDist == 0){
+                        streetBScore = 7;
+                    } else if(streetBDist > 0 && streetBDist < 50){
+                        streetBScore = 5;
+                    } else if(streetBDist >= 50 && streetBDist < 100){
+                        streetBScore = 3;
+                    } else if(streetBDist >= 100 && streetBDist < 500){
+                        streetBScore = 1;
+                    } else {
+                        streetBScore = 0;
+                    }
+
+                    streetScoreArray.push(streetBScore);
+                });
+            } else {
+                streetScoreArray.push(0);
+            };
+
+            streetBScoreArray = [];
+
+            let totalStreetBScore = Math.max(...streetScoreArray);
+            streetBScoreArray.push(totalStreetBScore);
+            console.log("Total Street B Score: ",streetBScoreArray[0]);
+        });
+    }
+
+    async function highwayScore(geometry,buffer){
+        const queryHighways = roadsLayerView.createQuery();
+        queryHighways.geometry = buffer;
+        queryHighways.outFields = ["8"];
+        queryHighways.returnGeometry = true;
+        queryHighways.where = "CARTOCODE IN ('1','2','3','4','5')";
+        await roadsLayerView.queryFeatures(queryHighways).then((results)=>{
+            let highwayArray = [];
+
+            if(results.features.length >= 1){
+                const features = results.features;
+
+                features.forEach(function(result,index){
+                    const highwayGeom = result.geometry;
+                    const highwayIntersect = geometryEngine.crosses(geometry,highwayGeom);
+                    
+                    let highwayScore;
+
+                    if(highwayIntersect){
+                        highwayScore = 10;
+                    } else {
+                        highwayScore = 0;
+                    };
+
+                    highwayArray.push(highwayScore);
+                });
+            } else {
+                highwayArray.push(0);
+            }
+
+            highwayScoreArray = [];
+            let totalHighwayScore = Math.max(...highwayArray);
+            highwayScoreArray.push(totalHighwayScore)
+            console.log("Total Highway Score: ",totalHighwayScore);
+        });
+    }
+
+    async function railroadScore(geometry,buffer){
+        const queryRailroads = railroadsLayerView.createQuery();
+        queryRailroads.geometry = buffer;
+        queryRailroads.outFields = ["*"];
+        queryRailroads.returnGeometry = true;
+        await railroadsLayerView.queryFeatures(queryRailroads).then((results)=>{
+            let railroadArray = [];
+            if (results.features.length >= 1){
+
+                const features = results.features;
+
+                features.forEach(function(result,index){
+                    const railroadGeom = result.geometry;
+                    const railroadIntersect = geometryEngine.crosses(geometry,railroadGeom);
+                    
+                    let railroadScore;
+
+                    if(railroadIntersect){
+                        railroadScore = 10;
+                    } else {
+                        railroadScore = 0;
+                    };
+
+                    railroadArray.push(railroadScore);
+                });
+            } else {
+                railroadArray.push(0);
+            }
+            railroadScoreArray = [];
+            let totalRailroadScore = Math.max(...railroadArray);
+            railroadScoreArray.push(totalRailroadScore)
+            console.log("Total Railroad Score: ",totalRailroadScore);
+        });
+    }
+
+    async function schoolScore(geometry,buffer){
+        const querySchools = schoolsPreKto12LayerView.createQuery();
+        querySchools.geometry = buffer;
+        querySchools.outFields = ["*"];
+        querySchools.returnGeometry = true;
+        await schoolsPreKto12LayerView.queryFeatures(querySchools).then((results)=>{
+            let schoolArray = [];
+            if (results.features.length >= 1){
+                const features = results.features;
+                features.forEach(function(result,index){
+                    const schoolGeom = result.geometry;
+                    const schoolDist = geometryEngine.distance(geometry, schoolGeom, "feet");
+                    console.log("School Distance: ",schoolDist);
+                    let schoolScore;
+                    if (schoolDist < 100){
+                        schoolScore = 10;
+                    } else if (schoolDist >= 100 && schoolDist < 150){
+                        schoolScore = 9;
+                    } else if (schoolDist >= 150 && schoolDist < 200){
+                        schoolScore = 7;
+                    } else if (schoolDist >= 200 && schoolDist < 300){
+                        schoolScore = 5;
+                    } else if (schoolDist >= 300 && schoolDist < 500){
+                        schoolScore = 3;
+                    } else if (schoolDist >= 500 && schoolDist < 1000){
+                        schoolScore = 1;
+                    } else {
+                        schoolScore = 0;
+                    }
+                    schoolArray.push(schoolScore);
+                })
+            } else {
+                schoolArray.push(0);
+            }
+            schoolScoreArray = [];
+            let totalSchoolScore = Math.max(...schoolArray);
+            schoolScoreArray.push(totalSchoolScore);
+            console.log("Total School Score: ",totalSchoolScore);
+        });
+    }
+
+    async function hospitalScore(geometry,buffer){
+        const queryHospitals = healthCareFacilitiesLayerView.createQuery();
+        queryHospitals.geometry = buffer;
+        queryHospitals.outFields = ["*"];
+        queryHospitals.returnGeometry = true;
+        await healthCareFacilitiesLayerView.queryFeatures(queryHospitals).then((results)=>{
+            let hospitalArray = [];
+            if (results.features.length >= 1){
+                const features = results.features;
+                features.forEach(function(result,index){
+                    const hospitalGeom = result.geometry;
+                    const hospitalDist = geometryEngine.distance(geometry, hospitalGeom, "feet");
+                    let hospitalScore;
+                    if (hospitalDist < 100){
+                        hospitalScore = 10;
+                    } else if (hospitalDist >= 100 && hospitalDist < 150){
+                        hospitalScore = 9;
+                    } else if (hospitalDist >= 150 && hospitalDist < 200){
+                        hospitalScore = 7;
+                    } else if (hospitalDist >= 200 && hospitalDist < 300){
+                        hospitalScore = 5;
+                    } else if (hospitalDist >= 300 && hospitalDist < 500){
+                        hospitalScore = 3;
+                    } else if (hospitalDist >= 500 && hospitalDist < 1000){
+                        hospitalScore = 1;
+                    } else {
+                        hospitalScore = 0;
+                    }
+                    hospitalArray.push(hospitalScore);
+                })
+            } else {
+                hospitalArray.push(0);
+            }
+            hospitalScoreArray = [];
+            let totalHospitalScore = Math.max(...hospitalArray);
+            hospitalScoreArray.push(totalHospitalScore);
+            console.log("Total Hospital Score: ",totalHospitalScore);
+        });
+    }
+
+    async function accessScore(geometry,buffer){
+        const queryAccess = roadsLayerView.createQuery();
+        queryAccess.geometry = buffer;
+        queryAccess.outFields = ["*"];
+        queryAccess.returnGeometry = true;
+        await roadsLayerView.queryFeatures(queryAccess).then((results) =>{
+            let accessArray = [];
+            if (results.features.length >= 1){
+                const features = results.features;
+                features.forEach(function(result,index){
+                    const accessGeometry = result.geometry;
+                    const accessDist = geometryEngine.distance(geometry,accessGeometry,"feet");
+                    console.log("Access distance: ",accessDist)
+                    let accessScore;
+                    if(accessDist == 0){
+                        accessScore = 1;
+                    } else if(accessDist > 0 && accessDist <= 50){
+                        accessScore = 3;
+                    } else if(accessDist > 50 && accessDist <= 100){
+                        accessScore = 5;
+                    } else if(accessDist > 100 && accessDist <= 200){
+                        accessScore = 7;
+                    } else if(accessDist > 200 && accessDist <= 350){
+                        accessScore = 9;
+                    } /*else if(accessDist > 350 && accessDist <= 500){
+                        accessScore = 10;
+                    } */else if(accessDist > 350) {
+                        accessScore = 10;
+                    }
+
+                    accessArray.push(accessScore);
+                });
+            } else {
+                accessArray.push(10);
+            }
+
+            accessScoreArray = [];
+            let totalAccessScore = Math.min(...accessArray);
+            accessScoreArray.push(totalAccessScore);
+            console.log("Total Access Score: ",totalAccessScore);
+        });
+    }
+
+    async function seasonalStreamScore(geometry,buffer){
+        
+        const querySeasonalStreams = streamsLayerView.createQuery();
+        querySeasonalStreams.geometry = buffer;
+        querySeasonalStreams.outFields = ["*"];
+        querySeasonalStreams.returnGeometry = true;
+        querySeasonalStreams.where = "FCode_Text IN ('Canal/Ditch', 'Canal/Ditch - Aqueduct', 'Stream/River', 'Stream/River - Ephemeral',"
+        + "'Stream/River - Intermittent')"
+        await streamsLayerView.queryFeatures(querySeasonalStreams).then((results)=>{
+            let seasonalStreamArray = [];
+            if (results.features.length >= 1){
+
+                const features = results.features;
+
+                features.forEach(function(result,index){
+                    const seasonalStreamGeom = result.geometry;
+                    const seasonalStreamIntersect = geometryEngine.crosses(geometry,seasonalStreamGeom);
+                    
+                    let seasonalStreamScore;
+
+                    if(seasonalStreamIntersect){
+                        seasonalStreamScore = 7;
+                    } else {
+                        seasonalStreamScore = 0;
+                    };
+
+                    seasonalStreamArray.push(seasonalStreamScore);
+                });
+            } else {
+                seasonalStreamArray.push(0);
+            }
+            seasonalStreamScoreArray = [];
+            let totalSeasonalStreamScore = Math.max(...seasonalStreamArray);
+            seasonalStreamScoreArray.push(totalSeasonalStreamScore);
+            console.log("Total Seasonal Stream Score: ",totalSeasonalStreamScore);
+            
+        });
+    }
+
+    async function perennialStreamScore(geometry, buffer){
+        const queryPerennialStreams = streamsLayerView.createQuery();
+        queryPerennialStreams.geometry = buffer;
+        queryPerennialStreams.outFields = ["*"];
+        queryPerennialStreams.returnGeometry = true;
+        queryPerennialStreams.where = "FCode_Text = 'Stream/River - Perennial'"
+        await streamsLayerView.queryFeatures(queryPerennialStreams).then((results)=>{
+            let perennialStreamArray = [];
+            if (results.features.length >= 1){
+
+                const features = results.features;
+
+                features.forEach(function(result,index){
+                    const perennialStreamGeom = result.geometry;
+                    const perennialStreamIntersect = geometryEngine.crosses(geometry,perennialStreamGeom);
+                    
+                    let perennialStreamScore;
+
+                    if(perennialStreamIntersect){
+                        perennialStreamScore = 9;
+                    } else {
+                        perennialStreamScore = 0;
+                    };
+
+                    perennialStreamArray.push(perennialStreamScore);
+                });
+            } else {
+                perennialStreamArray.push(0);
+            }
+            perennialStreamScoreArray = [];
+            let totalPerennialStreamScore = Math.max(...perennialStreamArray);
+            perennialStreamScoreArray.push(totalPerennialStreamScore);
+            console.log("Total Perennial Stream Score: ",totalPerennialStreamScore);
+            
+        });
+    }
+
+    function calculateScore(){
+        document.getElementById("pipeScore").innerText = pipeScore;
+        console.log("propertyScoreArray in CalculateScore",propertyScoreArray[0]);
+        const finalPropertyScore = propertyScoreArray[0];
+        document.getElementById("propertyScore").innerText = finalPropertyScore;
+        console.log("StreetAScore in CalculateScore",streetAScoreArray[0]);
+        console.log("StreetBScore in CalculateScore",streetBScoreArray[0]);
+        const finalStreetScore = Math.max(streetAScoreArray[0],streetBScoreArray[0]);
+        document.getElementById("streetScore").innerText = finalStreetScore;
+        console.log("Final Street Score: ",finalStreetScore);
+        const finalHighwayRailScore = Math.max(highwayScoreArray[0],railroadScoreArray[0])
+        document.getElementById("highwayRailroadScore").innerText = finalHighwayRailScore;
+        console.log("Final Highway Railroad Score: ",finalHighwayRailScore);
+        const finalCriticalFacScore = Math.max(schoolScoreArray[0],hospitalScoreArray[0]);
+        document.getElementById("criticalFacScore").innerText = finalCriticalFacScore;
+        console.log("Final Critical Facility Score:",finalCriticalFacScore)
+        const finalAccessScore = accessScoreArray[0];
+        document.getElementById("accessScore").innerText = finalAccessScore;
+        console.log("Final Access Score: ",finalAccessScore);
+        const finalStreamScore = Math.max(seasonalStreamScoreArray[0],perennialStreamScoreArray[0]);
+        document.getElementById("waterScore").innerText = finalStreamScore;
+        console.log("Final Stream Score: ",finalStreamScore);
+    }
+
+    /*let pipeScore;
     let propertyScore;
     let totalStreetAScore;
     let totalStreetBScore;
@@ -862,7 +1353,7 @@ require([
                         } else if(accessDist > 200 && accessDist <= 350){
                             accessScore = 9;
                         /*} else if(accessDist > 350 && accessDist <= 500){
-                            accessScore = 10;*/
+                            accessScore = 10;
                         } else if(accessDist > 350) {
                             accessScore = 10;
                         }
@@ -878,7 +1369,7 @@ require([
                 return totalAccessScore;
             });
 
-            //let totalSeasonalStreamScore;
+            let totalSeasonalStreamScore;
             const querySeasonalStreams = streamsLayerView.createQuery();
             querySeasonalStreams.geometry = buffer;
             querySeasonalStreams.outFields = ["*"];
@@ -914,7 +1405,7 @@ require([
                 
             });
 
-            //let totalPerennialStreamScore;
+            let totalPerennialStreamScore;
             const queryPerennialStreams = streamsLayerView.createQuery();
             queryPerennialStreams.geometry = buffer;
             queryPerennialStreams.outFields = ["*"];
@@ -972,5 +1463,5 @@ require([
 
         let totalCOFScore = (pipeScore*0.2) + (totalStreetScore*0.2) + (totalCriticalFacScore*0.2) + (propertyScore*0.2) + (totalAccessScore*0.1) + (totalWaterScore*0.09) + (totalHighwayRailroadScore*0.01)
         document.getElementById("totalScore").innerText = totalCOFScore;
-    }
+    }*/
 });
