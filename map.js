@@ -987,6 +987,7 @@ require([
         });
     }
 
+    let totalCOFScore;
     function calculateScore(){
         document.getElementById("pipeScore").innerText = pipeScore;
         console.log("propertyScoreArray in CalculateScore",propertyScoreArray[0]);
@@ -1009,6 +1010,9 @@ require([
         const finalStreamScore = Math.max(seasonalStreamScoreArray[0],perennialStreamScoreArray[0]);
         document.getElementById("waterScore").innerText = finalStreamScore;
         console.log("Final Stream Score: ",finalStreamScore);
+        totalCOFScore = ((pipeScore*0.2) + (finalStreetScore*0.2) + (finalCriticalFacScore*0.2) + 
+        (finalPropertyScore*0.2) + (finalAccessScore*0.1) + (finalStreamScore*0.09) + (finalHighwayRailScore*0.01)).toFixed(2);
+        document.getElementById("totalScore").innerText = totalCOFScore;
     }
 
     /*let pipeScore;
