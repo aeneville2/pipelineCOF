@@ -7,7 +7,7 @@ body {
 
 #titleBar {
     text-align: center;
-    height: 5vh;
+    /*height: 5vh;*/
     width: 100%;
     background-color: #004b8d;
     color: #fff;
@@ -25,10 +25,11 @@ body {
 
 #titleBar h3 {
     font-size: 20px;
+    float: left;
 }
 
 #sidePanel {
-    width: 20%;
+    /*width: 20%;*/
     float: left;
     text-align: center;
 }
@@ -62,6 +63,6 @@ table, td {
 
 #viewDiv {
     height: 95vh;
-    width: 80%;
+    /*width: 80%;*/
     float: right;
 }
