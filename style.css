@@ -30,6 +30,7 @@ body {
 
 #sidePanel {
     /*width: 20%;*/
+    height: 95vh;
     float: left;
     text-align: center;
 }
@@ -65,4 +66,19 @@ table, td {
     height: 95vh;
     /*width: 80%;*/
     float: right;
+}
+
+@media print{
+    #titleBarRow,
+    #info-header,
+    #info,
+    #calculate,
+    #pastScores,
+    #writeDB,
+    #toolBar{
+        display: none;
+    }
+    #cof-score-tbl {
+        break-after:page;
+    }
 }

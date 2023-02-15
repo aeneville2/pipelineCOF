@@ -70,16 +70,23 @@ require([
         expanded: false
     });
 
-    const print = new Print({
-        view: view
+    document.getElementById("print-btn").addEventListener("click",function(){
+        window.print();
     });
+    /*const print = new Print({
+        view: view
+    });*/
+
+    const node = document.getElementById("print-btn");
 
     const printExpand = new Expand({
         view: view,
-        content: print,
+        content: node,
         expandIconClass: "esri-icon-printer",
         container: "toolBar"
     });
+
+    view.ui.add("print-btn","bottom-right")
 
     //view.ui.add("titleBar","top-left");
     view.ui.move("zoom","top-left");
@@ -516,11 +523,16 @@ require([
                     highlight.remove();
                     feature = null;
                     graphics.removeAll();
+                    document.getElementById("pipeline_id").innerText = "";
                 }
                 feature = response.results.filter(function(result){
                     return result.graphic.layer === miPipes;
                 })[0].graphic;
                 highlight = miPipesLayerView.highlight(feature);
+
+                const name = feature.attributes["name"];
+
+                document.getElementById("pipeline_id").innerText = name;
 
                 return feature;
 
@@ -529,6 +541,7 @@ require([
                     highlight.remove();
                     feature = null;
                     graphics.removeAll();
+                    document.getElementById("pipeline_id").innerText = "";
                 }
             }
         })
