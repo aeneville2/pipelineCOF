@@ -97,9 +97,33 @@ require([
 
     const miPipes = new FeatureLayer({
         url: "https://maps.cuwcd.com/arcgis/rest/services/testing/MIPipelinesCOF/MapServer/0",
-        /*popupTemplate: {
-            title: "M&I Pipes"
-        },*/
+        popupTemplate: {
+            title: "{name}",
+            content: [
+                {
+                    type: "fields",
+                    fieldInfos: [
+                        {
+                            fieldName: "alt_name",
+                            label: "Alternate Name"
+                        },{
+                            fieldName: "diameter_inches",
+                            label: "Diameter (inches)",
+                            format: {
+                                digitSeparator: false,
+                                places: 0
+                            }
+                        },{
+                            fieldName: "description",
+                            label: "Description"
+                        },{
+                            fieldName: "facility_name",
+                            label: "Facility"
+                        }
+                    ]
+                }
+            ]
+        },
         definitionExpression: "facility_name = 'Alpine Aqueduct Reach 3'",
         title: "Alpine Aqueduct Reach 3 Pipelines",
         outFields: ["*"]
@@ -119,6 +143,21 @@ require([
         url: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/UtahRoads/FeatureServer/0",
         visible: false,
         title: "Utah Roads",
+        popupTemplate: {
+            title: "Utah Roads",
+            content: [{
+                type: "fields",
+                fieldInfos: [
+                    {
+                        fieldName: "FULLNAME",
+                        label: "Name"
+                    },{
+                        fieldName: "CARTOCODE",
+                        label: "Cartographic Code"
+                    }
+                ]
+            }]
+        },
         renderer: {
             type: "unique-value",
             field: "CARTOCODE",
@@ -221,10 +260,20 @@ require([
             type: "simple",
             symbol: {
                 type: "simple-line",
-                style: "short-dash-dot",
+                style: "long-dash-dot",
                 color: "#424242",
                 width: 2
             }
+        },
+        popupTemplate: {
+            title: "Utah Railroads",
+            content: [{
+                type: "fields",
+                fieldInfos: [{
+                    fieldName: "RAILROAD",
+                    label: "Railroad"
+                }]
+            }]
         }
     });
 
@@ -247,6 +296,21 @@ require([
         definitionExpression: "FCode_Text IN ('Canal/Ditch', 'Canal/Ditch - Aqueduct', 'Stream/River', 'Stream/River - Ephemeral',"
         + "'Stream/River - Intermittent', 'Stream/River - Perennial')",
         outFields: ["FCode_Text"],
+        popupTemplate: {
+            title: "Utah Streams",
+            content: [{
+                type: "fields",
+                fieldInfos: [
+                    {
+                        fieldName: "GNIS_Name",
+                        label: "Name"
+                    },{
+                        fieldName: "FCode_Text",
+                        label: "Feature Code Text"
+                    }
+                ]
+            }]
+        },
         renderer: {
             type: "unique-value",
             field: "FCode_Text",
@@ -357,7 +421,26 @@ require([
                 }
             }
         },
-        outFields: ["TOTAL_MKT_VALUE","PARCEL_ID"]
+        outFields: ["TOTAL_MKT_VALUE","PARCEL_ID"],
+        popupTemplate: {
+            title: "Utah County Parcels",
+            content: [{
+                type: "fields",
+                fieldInfos: [
+                    {
+                        fieldName: "PARCEL_ID",
+                        label: "Parcel ID"
+                    },{
+                        fieldName: "TOTAL_MKT_VALUE",
+                        label: "Total Market Value",
+                        format: {
+                            digitSeparator: true,
+                            places: 2
+                        }
+                    }
+                ]
+            }]
+        }
     });
 
     const schoolsPreKto12 = new FeatureLayer({
@@ -382,7 +465,19 @@ require([
                 name: "school"
             }
         },
-        outFields: ["OBJECTID"]
+        outFields: ["OBJECTID"],
+        popupTemplate: {
+            title: "Utah Schools PreK to 12",
+            content: [{
+                type: "fields",
+                fieldInfos: [
+                    {
+                        fieldName: "SchoolName",
+                        label: "School Name"
+                    }
+                ]
+            }]
+        }
     });
 
     const healthCareFacilities = new FeatureLayer({
@@ -409,7 +504,19 @@ require([
             }
         },
         outFields: ["TYPE"],
-        definitionExpression: "TYPE = 'HOSPITAL'"
+        definitionExpression: "TYPE = 'HOSPITAL'",
+        popupTemplate: {
+            title: "Utah Health Care Facilities - Hospitals",
+            content: [{
+                type: "fields",
+                fieldInfos: [
+                    {
+                        fieldName: "NAME",
+                        label: "Name"
+                    }
+                ]
+            }]
+        }
     });
 
     map.addMany([roads,railroads,streams,utahCountyParcels,schoolsPreKto12,healthCareFacilities]);
