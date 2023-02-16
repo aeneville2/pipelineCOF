@@ -69,7 +69,7 @@ table, td {
 }
 
 @media print{
-    #titleBarRow,
+    #navBar,
     #info-header,
     #info,
     #calculate,
