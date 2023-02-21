@@ -377,7 +377,7 @@ require([
                     symbol: {
                         type: "simple-line",
                         color: "#99e6f0",
-                        width: 1
+                        width: 3
                     }
                 }
             ]
