@@ -13,8 +13,8 @@
             <h3>CUWCD Pipeline Consequence of Failure Scoring Application</h3>
         </div>
     </div>-->
-    <nav class="navbar navbar-expand sticky-top" id="navBar" style="height:5vh;">
-        <div class="container-fluid" style="background-color:#004b8d;">
+    <nav class="navbar navbar-expand sticky-top" id="navBar">
+        <div class="container-fluid">
             <a class="navbar-brand" href="#">
                 <img src="https://blog.cuwcd.com/wp-content/uploads/2020/10/Color-Icon1.png" style="width:50px;">
             </a>
@@ -26,10 +26,25 @@
     <div class="container-fluid">
         <div class="row" id="mapSidePanelRow" style="height:95vh;">
             <div class="col-md-2 col-xs-12" id="sidePanel">
-                <h5 id="info-header">Information</h5>
-                <p id="info">Spot for information about the app.</p>
+                <h5 id="info-header">App Information</h5>
+                <p id="info">The purpose of this application is to calculate consequence of failure scores for pipelines according to the <a href="COF Category Table 14 Apr22.png">
+                    scoring matrix.</a> To calculate the scores for a pipeline, click on the pipeline in the map and then click the "Calculate Score" button below. The scores will 
+                    populate in the table. To record the scores to the database, click the "Submit to DB" button. To view past scores for the pipeline 
+                    (if they have been calculated and stored in the database), click on the "Past Scores" button below.
+                </p>
+                <p>
+                    In the map there are additional tools:
+                    <ul>
+                        <li>Basemap Gallery to switch the basemap</li>
+                        <li>Map Legend</li>
+                        <li>Layer List to turn on/off the other layers involved in the score calculations (such as roads)</li>
+                        <li>Measurement Tool to manually measure any distances in the map</li>
+                        <li>Print Button to print the map and scoring table</li>
+                    </ul> 
+                </p>
+                <br>
                 <h5 id="score-header">COF Score for Selected Pipeline:</h5>
-                <h6 id="pipeline_id"></h6>
+                <h5 id="pipeline_id"></h5>
                 <table id="cof-score-tbl">
                     <tr>
                         <td>Pipe Diameter</td>
@@ -64,9 +79,9 @@
                         <td id="totalScore" style="text-align: center;"></td>
                     </tr>
                 </table>
-                <button id="pastScores">Past Scores</button>
-                <button id="calculate">Calculate Score</button>
+                <button id="calculate" style="margin-top:20px;">Calculate Score</button>
                 <button id="writeDB">Submit to DB</button>
+                <button id="pastScores">Past Scores</button>
             </div>
             <div class="col-md-10 col-xs-12" id="viewDiv"></div>
         </div>

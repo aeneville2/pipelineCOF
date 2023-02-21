@@ -5,15 +5,20 @@ body {
     width: 100%;
 }
 
-#titleBar {
+#navBar {
+    height: 5vh;
+    background-color: #004b8d;
+}
+
+/*#titleBar {
     text-align: center;
-    /*height: 5vh;*/
+    height: 5vh;
     width: 100%;
     background-color: #004b8d;
     color: #fff;
     display: flex;
     align-items: center;
-}
+}*/
 
 #titleBar img {
     width: 50px;
@@ -29,7 +34,6 @@ body {
 }
 
 #sidePanel {
-    /*width: 20%;*/
     height: 95vh;
     float: left;
     text-align: center;
@@ -37,12 +41,13 @@ body {
 
 #sidePanel h5{
     font-size: 16px;
+    margin-top: 10px;
 }
 
-#sidePanel p{
+#sidePanel p,ul{
     font-size: 12px;
     margin-left: 10px;
-    text-align: center;
+    text-align: left;
 }
 
 table, td {
@@ -56,6 +61,7 @@ table, td {
     background-color: #004b8d;
     color: #fff;
     margin: 10px;
+    font-size: 12px;
 }
 
 #sidePanel button:hover{
