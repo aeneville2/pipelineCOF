@@ -78,10 +78,13 @@ table, td {
     #navBar,
     #info-header,
     #info,
+    #map-tools,
+    #map-tools-list,
     #calculate,
     #pastScores,
     #writeDB,
-    #toolBar{
+    #toolBar,
+    #miPopup{
         display: none;
     }
     #cof-score-tbl {

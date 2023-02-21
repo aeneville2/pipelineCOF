@@ -10,7 +10,7 @@ require([
     "esri/layers/FeatureLayer",
     "esri/geometry/geometryEngine",
     "esri/layers/GraphicsLayer",
-    "esri/Graphic"
+    "esri/Graphic",
 ], function(Map, MapView, BasemapGallery, Legend, LayerList, Measurement, Print, Expand, FeatureLayer,
     geometryEngine, GraphicsLayer, Graphic){
     const map = new Map({
@@ -21,7 +21,10 @@ require([
         container: "viewDiv",
         map: map,
         center: [-111.75, 40.37],
-        zoom: 13
+        zoom: 13,
+        popup: {
+            dockEnabled: true
+        }
     });
 
     const basemapGallery = new BasemapGallery({
@@ -70,8 +73,9 @@ require([
         expanded: false
     });
 
-    document.getElementById("print-btn").addEventListener("click",function(){
-        window.print();
+    document.getElementById("print-btn").addEventListener("click",async function(){
+        const closedPopup = await view.popup.close();
+        Promise.all([closedPopup]).then(window.print());
     });
 
     const node = document.getElementById("print-btn");
@@ -98,6 +102,7 @@ require([
     const miPipes = new FeatureLayer({
         url: "https://maps.cuwcd.com/arcgis/rest/services/testing/MIPipelinesCOF/MapServer/0",
         popupTemplate: {
+            id: "miPopup",
             title: "{name}",
             content: [
                 {
@@ -124,7 +129,6 @@ require([
                 }
             ]
         },
-        definitionExpression: "facility_name = 'Alpine Aqueduct Reach 3'",
         title: "Alpine Aqueduct Reach 3 Pipelines",
         outFields: ["*"]
     });
@@ -144,6 +148,7 @@ require([
         visible: false,
         title: "Utah Roads",
         popupTemplate: {
+            id: "roads-popup",
             title: "Utah Roads",
             content: [{
                 type: "fields",
@@ -525,7 +530,8 @@ require([
     map.add(miPipes,100);
 
     const graphics = new GraphicsLayer({
-        title: "Graphics"
+        title: "Graphics",
+        listMode: "hide"
     });
     map.add(graphics);
 
@@ -671,7 +677,11 @@ require([
             const buffer = geometryEngine.buffer(geometry, 1000, "feet");
             const bufferSym = {
                 type: "simple-fill",
-                color: [140,140,222,0.8]
+                color: [0,0,0,0],
+                outline: {
+                    color: [0,0,0,0],
+                    width: 1
+                }
             };
             graphics.add(new Graphic({
                 geometry: buffer,
