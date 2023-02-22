@@ -22,24 +22,29 @@
         </div>
     </nav>
     <div id="toolBar" class="esri-widget"></div>
-    <button id="print-btn" class="esri-widget">Print</button>
+    <button id="print-btn" class="esri-widget">Click to Print</button>
     <div class="container-fluid">
         <div class="row" id="mapSidePanelRow" style="height:95vh;">
             <div class="col-md-2 col-xs-12" id="sidePanel">
                 <h5 id="info-header">App Information</h5>
-                <p id="info">The purpose of this application is to calculate consequence of failure scores for pipelines according to the <a href="COF Category Table 14 Apr22.png" target="_blank">
-                    scoring matrix.</a> To calculate the scores for a pipeline, click on the pipeline in the map and then click the "Calculate Score" button below. The scores will 
-                    populate in the table. To record the scores to the database, click the "Submit to DB" button. To view past scores for the pipeline 
-                    (if they have been calculated and stored in the database), click on the "Past Scores" button below.
+                <p id="info">The purpose of this application is to calculate consequence of failure scores for pipeline assets according to the <a href="COF Category Table 14 Apr22.png" target="_blank">
+                    scoring matrix.</a>
+                    <ol>
+                        <li><strong>Calculate Score: </strong>To calculate the scores for a pipeline, click on the pipeline in the map and then click the "Calculate Score" button below.
+                        The scores will populate in the table.</li>
+                        <li><strong>Submit to DB: </strong>To record the scores to the database (DB), click the "Submit to DB" button.</li>
+                        <li><strong>Past Scores: </strong>To view past scores for the selected pipeline 
+                            (if they have been calculated and stored in the database), click on the "Past Scores" button below.</li>
+                    </ol>
                 </p>
                 <p id="map-tools">
                     In the map there are additional tools:
                     <ul id="map-tools-list">
-                        <li>Basemap Gallery to switch the basemap</li>
-                        <li>Map Legend</li>
-                        <li>Layer List to turn on/off the other layers involved in the score calculations (such as roads)</li>
-                        <li>Measurement Tool to manually measure any distances in the map</li>
-                        <li>Print Button to print the map and scoring table</li>
+                        <li><strong>Basemap Gallery: </strong>Switch the basemap</li>
+                        <li><strong>Map Legend</strong></li>
+                        <li><strong>Layer List: </strong>Turn on/off the other layers involved in the score calculations (e.g., roads)</li>
+                        <li><strong>Measurement Tool: </strong>Manually measure any distances in the map</li>
+                        <li><strong>Print Button: </strong>Print the map and scoring table</li>
                     </ul> 
                 </p>
                 <br>

@@ -20,7 +20,7 @@ body {
     align-items: center;
 }*/
 
-#titleBar img {
+/*#titleBar img {
     width: 50px;
     height: auto;
     float: left;
@@ -31,6 +31,17 @@ body {
 #titleBar h3 {
     font-size: 20px;
     float: left;
+}*/
+
+#print-btn {
+    background-color:#6cb33f;
+    color:white;
+    padding:10px;
+}
+
+#print-btn:hover{
+    background-color:#b6b8ba;
+    color:black;
 }
 
 #sidePanel {
@@ -44,7 +55,7 @@ body {
     margin-top: 10px;
 }
 
-#sidePanel p,ul{
+#sidePanel p,ul,ol{
     font-size: 12px;
     margin-left: 10px;
     text-align: left;

@@ -35,6 +35,9 @@ require([
         view: view,
         content: basemapGallery,
         expandIconClass: "esri-icon-basemap",
+        expandTooltip: "Basemap Gallery",
+        collapseIconClass: "esri-icon-close",
+        collapseTooltip: "Close Gallery",
         container: "toolBar"
     });
 
@@ -46,6 +49,9 @@ require([
         view: view,
         content: legend,
         expandIconClass: "esri-icon-legend",
+        expandTooltip: "Map Legend",
+        collapseIconClass: "esri-icon-close",
+        collapseTooltip: "Close Legend",
         container: "toolBar"
     });
 
@@ -57,6 +63,9 @@ require([
         view: view,
         content: layerList,
         expandIconClass: "esri-icon-layer-list",
+        expandTooltip: "Layer List",
+        collapseIconClass: "esri-icon-close",
+        collapseTooltip: "Close Layer List",
         container: "toolBar"
     });
 
@@ -70,7 +79,10 @@ require([
         content: measurement,
         expandIconClass: "esri-icon-measure",
         container: "toolBar",
-        expanded: false
+        expanded: false,
+        collapseIconClass: "esri-icon-close",
+        expandTooltip: "Measurement Tool",
+        collapseTooltip: "Stop measuring and close tool",
     });
 
     document.getElementById("print-btn").addEventListener("click",async function(){
@@ -84,6 +96,9 @@ require([
         view: view,
         content: node,
         expandIconClass: "esri-icon-printer",
+        expandTooltip: "Reveal Print Button",
+        collapseIconClass: "esri-icon-close",
+        collapseTooltip: "Hide Print Button",
         container: "toolBar"
     });
 
