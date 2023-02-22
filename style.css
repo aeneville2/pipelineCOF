@@ -69,14 +69,16 @@ table, td {
 }
 
 #sidePanel button{
-    background-color: #004b8d;
+    background-color: #6cb33f;
     color: #fff;
     margin: 10px;
-    font-size: 12px;
+    padding: 7px;
+    font-size: 14px;
 }
 
 #sidePanel button:hover{
     background-color: #b6b8ba;
+    color: black;
 }
 
 #viewDiv {

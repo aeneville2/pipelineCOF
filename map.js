@@ -38,7 +38,8 @@ require([
         expandTooltip: "Basemap Gallery",
         collapseIconClass: "esri-icon-close",
         collapseTooltip: "Close Gallery",
-        container: "toolBar"
+        container: "toolBar",
+        group: "expandWidgets"
     });
 
     const legend = new Legend({
@@ -52,7 +53,8 @@ require([
         expandTooltip: "Map Legend",
         collapseIconClass: "esri-icon-close",
         collapseTooltip: "Close Legend",
-        container: "toolBar"
+        container: "toolBar",
+        group: "expandWidgets"
     });
 
     const layerList = new LayerList({
@@ -66,7 +68,8 @@ require([
         expandTooltip: "Layer List",
         collapseIconClass: "esri-icon-close",
         collapseTooltip: "Close Layer List",
-        container: "toolBar"
+        container: "toolBar",
+        group: "expandWidgets"
     });
 
     const measurement = new Measurement({
@@ -83,6 +86,7 @@ require([
         collapseIconClass: "esri-icon-close",
         expandTooltip: "Measurement Tool",
         collapseTooltip: "Stop measuring and close tool",
+        group: "expandWidgets"
     });
 
     document.getElementById("print-btn").addEventListener("click",async function(){
@@ -99,7 +103,8 @@ require([
         expandTooltip: "Reveal Print Button",
         collapseIconClass: "esri-icon-close",
         collapseTooltip: "Hide Print Button",
-        container: "toolBar"
+        container: "toolBar",
+        group: "expandWidgets"
     });
 
     view.ui.add("print-btn","bottom-right")
@@ -260,7 +265,22 @@ require([
                 }
             ]
         },
-        outFields: ["CARTOCODE"]
+        outFields: ["CARTOCODE","FULLNAME"],
+        labelingInfo: [
+            {
+                labelExpressionInfo: {expression: "Proper($feature.FULLNAME) + TextFormatting.NewLine + 'CartoCode: ' + $feature.CARTOCODE"},
+                symbol: {
+                    type: "text",
+                    color: "black",
+                    font: {family: "Arial"},
+                    haloSize: 0.75,
+                    haloColor: "#db7f39"
+                },
+                labelPlacement: "center-along",
+                repeatLabel: true,
+                repeatLabelDistance: "2000px"
+            }
+        ]
     });
     
     const railroads = new FeatureLayer({
@@ -294,7 +314,22 @@ require([
                     label: "Railroad"
                 }]
             }]
-        }
+        },
+        labelingInfo: [
+            {
+                labelExpressionInfo: {expression: "Proper($feature.RAILROAD)"},
+                symbol: {
+                    type: "text",
+                    color: "black",
+                    font: {family: "Arial"},
+                    haloSize: 0.75,
+                    haloColor: "#424242"
+                },
+                labelPlacement: "center-along",
+                repeatLabel: true,
+                repeatLabelDistance: "2000px"
+            }
+        ]
     });
 
     const streams = new FeatureLayer({
@@ -315,7 +350,25 @@ require([
         title: "Utah Streams",
         definitionExpression: "FCode_Text IN ('Canal/Ditch', 'Canal/Ditch - Aqueduct', 'Stream/River', 'Stream/River - Ephemeral',"
         + "'Stream/River - Intermittent', 'Stream/River - Perennial')",
-        outFields: ["FCode_Text"],
+        outFields: ["GNIS_Name","FCode_Text"],
+        labelingInfo: [
+            {
+                labelExpressionInfo: {expression: "Proper($feature.GNIS_Name) + TextFormatting.NewLine + '(' + $feature.FCode_Text + ')'"},
+                symbol: {
+                    type: "text",
+                    color: "black",
+                    font: {
+                        family: "Arial",
+                        style: "italic"
+                    },
+                    haloSize: 0.75,
+                    haloColor: "#22daf2"
+                },
+                labelPlacement: "center-along",
+                repeatLabel: true,
+                repeatLabelDistance: "2000px"
+            }
+        ],
         popupTemplate: {
             title: "Utah Streams",
             content: [{
@@ -460,7 +513,19 @@ require([
                     }
                 ]
             }]
-        }
+        },
+        labelingInfo: [
+            {
+                labelExpressionInfo: {expression: "'Parcel: ' + Proper($feature.PARCEL_ID) + TextFormatting.NewLine + 'Total Market Value: $' + Text($feature.TOTAL_MKT_VALUE,'#,###.##')"},
+                symbol: {
+                    type: "text",
+                    color: "black",
+                    font: {family: "Arial"},
+                    haloSize: 0.75,
+                    haloColor: "white"
+                }
+            }
+        ]
     });
 
     const schoolsPreKto12 = new FeatureLayer({
@@ -485,7 +550,7 @@ require([
                 name: "school"
             }
         },
-        outFields: ["OBJECTID"],
+        outFields: ["OBJECTID","SchoolName"],
         popupTemplate: {
             title: "Utah Schools PreK to 12",
             content: [{
@@ -497,7 +562,20 @@ require([
                     }
                 ]
             }]
-        }
+        },
+        labelingInfo: [
+            {
+                labelExpressionInfo: {expression: "Proper($feature.SchoolName)"},
+                symbol: {
+                    type: "text",
+                    color: "black",
+                    font: {family: "Arial"},
+                    haloSize: 0.75,
+                    haloColor: "#d4a6f7"
+                },
+                labelPlacement: "above-center"
+            }
+        ]
     });
 
     const healthCareFacilities = new FeatureLayer({
@@ -523,7 +601,7 @@ require([
                 name: "hospital"
             }
         },
-        outFields: ["TYPE"],
+        outFields: ["TYPE","NAME"],
         definitionExpression: "TYPE = 'HOSPITAL'",
         popupTemplate: {
             title: "Utah Health Care Facilities - Hospitals",
@@ -536,11 +614,24 @@ require([
                     }
                 ]
             }]
-        }
+        },
+        labelingInfo: [
+            {
+                labelExpressionInfo: {expression: "Proper($feature.NAME)"},
+                symbol: {
+                    type: "text",
+                    color: "black",
+                    font: {family: "Arial"},
+                    haloSize: 0.75,
+                    haloColor: "#fc7674"
+                },
+                labelPlacement: "above-center"
+            }
+        ]
     });
 
-    map.addMany([roads,railroads,streams,utahCountyParcels,schoolsPreKto12,healthCareFacilities]);
-    map.addMany([roadsVisible,railroadsVisible,streamsVisible,utahCountyParcelsVisible,schoolsPreKto12Visible,healthCareFacilitiesVisible]);
+    map.addMany([utahCountyParcels,roads,railroads,streams,schoolsPreKto12,healthCareFacilities]);
+    map.addMany([utahCountyParcelsVisible,roadsVisible,railroadsVisible,streamsVisible,schoolsPreKto12Visible,healthCareFacilitiesVisible]);
     
     map.add(miPipes,100);
 
