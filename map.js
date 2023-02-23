@@ -196,35 +196,35 @@ require([
                     value: "1",
                     symbol: {
                         type: "simple-line",
-                        color: "#FC7703",
+                        color: "#FC6F03",
                         width: 3
                     }
                 },{
                     value: "2",
                     symbol: {
                         type: "simple-line",
-                        color: "#FC7703",
+                        color: "#FC6F03",
                         width: 3
                     }
                 },{
                     value: "3",
                     symbol: {
                         type: "simple-line",
-                        color: "#FC7703",
+                        color: "#FC6F03",
                         width: 3
                     }
                 },{
                     value: "4",
                     symbol: {
                         type: "simple-line",
-                        color: "#FC7703",
+                        color: "#FC6F03",
                         width: 3
                     }
                 },{
                     value: "5",
                     symbol: {
                         type: "simple-line",
-                        color: "#FC7703",
+                        color: "#FC6F03",
                         width: 3
                     }
                 },{
@@ -394,7 +394,7 @@ require([
                 color: "#22daf2"
             },
             uniqueValueInfos: [
-                {
+                /*{
                     value: "Canal/Ditch",
                     symbol: {
                         type: "simple-line",
@@ -406,7 +406,134 @@ require([
                         },
                         width: 1
                     }
-                },{
+                },*/
+                {
+                    //https://developers.arcgis.com/javascript/latest/sample-code/cim-line-arrows/ 
+                    value: "Canal/Ditch",
+                    symbol: {
+                        type: "cim",
+                        data: {
+                            type: "CIMSymbolReference",
+                            symbol: {
+                                type: "CIMLineSymbol",
+                                symbolLayers: [
+                                    {
+                                        type: "CIMSolidStroke", //line symbol
+                                        enable: true,
+                                        width: 1,
+                                        color: [153,230,240,255]
+                                    },
+                                    {
+                                        type: "CIMVectorMarker", //arrow symbol
+                                        enable: true,
+                                        size: 3,
+                                        markerPlacement: {
+                                            type: "CIMMarkerPlacementAlongLineSameSize", //place same size markers along line
+                                            endings: "WithMarkers",
+                                            placementTemplate: [40], //space between arrows
+                                            angleToLine: true //symbol maintain angle to line when map is rotated
+                                        },
+                                        frame: {
+                                            xmin: -5,
+                                            ymin: -5,
+                                            xmax: 5,
+                                            ymax: 5
+                                        },
+                                        markerGraphics: [
+                                            {
+                                                type: "CIMMarkerGraphic",
+                                                geometry: {
+                                                    rings: [
+                                                        [
+                                                            [-8,-5.47],
+                                                            [-8,5.6],
+                                                            [1.96,-0.03],
+                                                            [-8,-5.47]
+                                                        ]
+                                                    ]
+                                                },
+                                                symbol: {
+                                                    type: "CIMPolygonSymbol", //fill for arrow symbol
+                                                    symbolLayers: [
+                                                        {
+                                                            type: "CIMSolidFill",
+                                                            enable: true,
+                                                            color: [0,0,0,255]
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                {
+                    //https://developers.arcgis.com/javascript/latest/sample-code/cim-line-arrows/ 
+                    value: "Canal/Ditch - Aqueduct",
+                    symbol: {
+                        type: "cim",
+                        data: {
+                            type: "CIMSymbolReference",
+                            symbol: {
+                                type: "CIMLineSymbol",
+                                symbolLayers: [
+                                    {
+                                        type: "CIMSolidStroke", //line symbol
+                                        enable: true,
+                                        width: 1,
+                                        color: [153,230,240,255]
+                                    },
+                                    {
+                                        type: "CIMVectorMarker", //arrow symbol
+                                        enable: true,
+                                        size: 3,
+                                        markerPlacement: {
+                                            type: "CIMMarkerPlacementAlongLineSameSize", //place same size markers along line
+                                            endings: "WithMarkers",
+                                            placementTemplate: [40], //space between arrows
+                                            angleToLine: true //symbol maintain angle to line when map is rotated
+                                        },
+                                        frame: {
+                                            xmin: -5,
+                                            ymin: -5,
+                                            xmax: 5,
+                                            ymax: 5
+                                        },
+                                        markerGraphics: [
+                                            {
+                                                type: "CIMMarkerGraphic",
+                                                geometry: {
+                                                    rings: [
+                                                        [
+                                                            [-8,-5.47],
+                                                            [-8,5.6],
+                                                            [1.96,-0.03],
+                                                            [-8,-5.47]
+                                                        ]
+                                                    ]
+                                                },
+                                                symbol: {
+                                                    type: "CIMPolygonSymbol", //fill for arrow symbol
+                                                    symbolLayers: [
+                                                        {
+                                                            type: "CIMSolidFill",
+                                                            enable: true,
+                                                            color: [0,0,0,255]
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                /*{
                     value: "Canal/Ditch - Aqueduct",
                     symbol: {
                         type: "simple-line",
@@ -418,7 +545,7 @@ require([
                         },
                         width: 1
                     }
-                },{
+                },*/{
                     value: "Stream/River",
                     symbol: {
                         type: "simple-line",
