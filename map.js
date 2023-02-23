@@ -188,7 +188,7 @@ require([
             field: "CARTOCODE",
             defaultSymbol: {
                 type: "simple-line",
-                color: "#db7f39",
+                color: "#FCBA03",
                 width: 1
             },
             uniqueValueInfos: [
@@ -196,70 +196,70 @@ require([
                     value: "1",
                     symbol: {
                         type: "simple-line",
-                        color: "#db7f39",
+                        color: "#FC7703",
                         width: 3
                     }
                 },{
                     value: "2",
                     symbol: {
                         type: "simple-line",
-                        color: "#db7f39",
+                        color: "#FC7703",
                         width: 3
                     }
                 },{
                     value: "3",
                     symbol: {
                         type: "simple-line",
-                        color: "#db7f39",
+                        color: "#FC7703",
                         width: 3
                     }
                 },{
                     value: "4",
                     symbol: {
                         type: "simple-line",
-                        color: "#db7f39",
+                        color: "#FC7703",
                         width: 3
                     }
                 },{
                     value: "5",
                     symbol: {
                         type: "simple-line",
-                        color: "#db7f39",
+                        color: "#FC7703",
                         width: 3
                     }
                 },{
                     value: "6",
                     symbol: {
                         type: "simple-line",
-                        color: "#db7f39",
+                        color: "#FC9803",
                         width: 2
                     }
                 },{
                     value: "7",
                     symbol: {
                         type: "simple-line",
-                        color: "#db7f39",
+                        color: "#FC9803",
                         width: 2
                     }
                 },{
                     value: "8",
                     symbol: {
                         type: "simple-line",
-                        color: "#db7f39",
+                        color: "#FC9803",
                         width: 2
                     }
                 },{
                     value: "9",
                     symbol: {
                         type: "simple-line",
-                        color: "#db7f39",
+                        color: "#FC9803",
                         width: 2
                     }
                 },{
                     value: "10",
                     symbol: {
                         type: "simple-line",
-                        color: "#db7f39",
+                        color: "#FC9803",
                         width: 2
                     }
                 }
@@ -268,7 +268,7 @@ require([
         outFields: ["CARTOCODE","FULLNAME"],
         labelingInfo: [
             {
-                labelExpressionInfo: {expression: "Proper($feature.FULLNAME) + TextFormatting.NewLine + 'CartoCode: ' + $feature.CARTOCODE"},
+                labelExpressionInfo: {expression: "Proper($feature.FULLNAME) + TextFormatting.NewLine + 'Code: ' + $feature.CARTOCODE"},
                 symbol: {
                     type: "text",
                     color: "black",
@@ -278,7 +278,8 @@ require([
                 },
                 labelPlacement: "center-along",
                 repeatLabel: true,
-                repeatLabelDistance: "2000px"
+                repeatLabelDistance: "2000px",
+                labelPosition: "parallel"
             }
         ]
     });
@@ -366,7 +367,8 @@ require([
                 },
                 labelPlacement: "center-along",
                 repeatLabel: true,
-                repeatLabelDistance: "2000px"
+                repeatLabelDistance: "2000px",
+                labelPosition: "curved"
             }
         ],
         popupTemplate: {
@@ -445,7 +447,7 @@ require([
                     symbol: {
                         type: "simple-line",
                         color: "#99e6f0",
-                        width: 3
+                        width: 2
                     }
                 }
             ]
